@@ -1,0 +1,127 @@
+@import './variables.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root {
+    @apply h-full w-full m-0 p-0;
+    font-family: var(--elaw-font-body);
+    background-color: var(--elaw-background);
+    color: var(--elaw-text-primary);
+  }
+
+  [data-theme-id="dark_glass"] body {
+    background: radial-gradient(ellipse at 20% 0%, #1e1b4b 0%, #0f172a 45%, #020617 100%);
+  }
+
+  [data-theme-id="dark_glass"] #root {
+    background-color: transparent;
+  }
+
+  * {
+    @apply box-border;
+  }
+
+  code, pre {
+    font-family: var(--elaw-font-code);
+  }
+}
+
+@layer components {
+  /* Generic cel panel: gradient surface + thick outline + glow */
+  .cel-panel {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 10%),
+                var(--elaw-glass-bg);
+    border: 2px solid var(--elaw-glass-border);
+    box-shadow: var(--elaw-glow);
+  }
+
+  /* Cel-shaded surface: matte dark base + top highlight + outline glow */
+  .cel-surface {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 12%),
+                var(--elaw-glass-bg);
+    border: 2px solid var(--elaw-glass-border);
+    box-shadow: var(--elaw-glow);
+  }
+
+  /* Agent dialogue bubble: dark fill + colored outline + inner top highlight */
+  .cel-bubble-agent {
+    position: relative;
+    background: var(--elaw-agent-bubble);
+    border: 2px solid var(--elaw-glass-border);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 4px 12px rgba(0, 0, 0, 0.35);
+  }
+  .cel-bubble-agent::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.08) 0%, transparent 30%);
+  }
+
+  /* User bubble: primary fill + dark outline + inner highlight */
+  .cel-bubble-user {
+    position: relative;
+    background: var(--elaw-user-bubble);
+    border: 2px solid rgba(0, 0, 0, 0.35);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 4px 12px rgba(0, 0, 0, 0.35);
+  }
+  .cel-bubble-user::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, transparent 35%);
+  }
+
+  /* Cel button: pill shape, outline, inner highlight, pressed state */
+  .cel-button {
+    @apply rounded-full border-2 transition-all;
+    border-color: var(--elaw-glass-border);
+    background: var(--elaw-glass-highlight);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 2px 8px rgba(0, 0, 0, 0.25);
+  }
+  .cel-button:hover {
+    background: rgba(255, 112, 67, 0.2);
+  }
+  .cel-button:active {
+    transform: translateY(1px);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.35);
+  }
+
+  .markdown-body pre {
+    @apply rounded-lg p-4 overflow-x-auto;
+    background-color: var(--elaw-code-bg);
+  }
+
+  .markdown-body code {
+    @apply px-1 py-0.5 rounded text-sm;
+    background-color: var(--elaw-code-bg);
+  }
+
+  .markdown-body pre code {
+    @apply p-0 bg-transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    @apply w-1.5 h-1.5;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply rounded-full;
+    background-color: color-mix(in srgb, var(--elaw-text-secondary) 30%, transparent);
+  }
+
+  .touch-pan-y {
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+  }
+}

@@ -1,0 +1,277 @@
+import { useState, useRef, useCallback, useEffect } from 'react'
+import { Paperclip, Send, Zap, Bot, ChevronDown } from 'lucide-react'
+import { useAdapterStore } from '@/stores/adapterStore'
+import QuickActionBar, { type AgentMode } from './QuickActionBar'
+
+interface ChatInputProps {
+  sendMessage: (message: unknown) => boolean
+}
+
+function computeRows(text: string): number {
+  const lines = text.split('\n').length
+  return Math.min(5, Math.max(1, lines))
+}
+
+type ParsedCommand =
+  | { type: 'user_input'; text: string; mode?: AgentMode }
+  | {
+      type: 'client_command'
+      command:
+        | 'change_working_dir'
+        | 'list_kimi_sessions'
+        | 'switch_kimi_session'
+        | 'switch_adapter'
+      args: string
+    }
+
+function parseSlashCommand(text: string): ParsedCommand | null {
+  const trimmed = text.trim()
+  const planMatch = trimmed.match(/^\/(plan|planmode)\s+(.*)$/i)
+  if (planMatch) {
+    return { type: 'user_input', text: planMatch[2].trim(), mode: 'plan' }
+  }
+  const yoloMatch = trimmed.match(/^\/yolo\s+(.*)$/i)
+  if (yoloMatch) {
+    return { type: 'user_input', text: yoloMatch[1].trim(), mode: 'yolo' }
+  }
+  const pyMatch = trimmed.match(/^\/(py|planyolo)\s+(.*)$/i)
+  if (pyMatch) {
+    return { type: 'user_input', text: pyMatch[2].trim(), mode: 'plan_yolo' }
+  }
+  const cdMatch = trimmed.match(/^\/cd\s+(\S.*)$/)
+  if (cdMatch) {
+    return { type: 'client_command', command: 'change_working_dir', args: cdMatch[1].trim() }
+  }
+  if (/^\/sessions?$/i.test(trimmed)) {
+    return { type: 'client_command', command: 'list_kimi_sessions', args: '' }
+  }
+  const switchMatch = trimmed.match(/^\/switch\s+(\S+)$/i)
+  if (switchMatch) {
+    return { type: 'client_command', command: 'switch_kimi_session', args: switchMatch[1] }
+  }
+  const adapterMatch = trimmed.match(/^\/adapter\s+(\S+)$/i)
+  if (adapterMatch) {
+    return { type: 'client_command', command: 'switch_adapter', args: adapterMatch[1] }
+  }
+  return null
+}
+
+export default function ChatInput({ sendMessage }: ChatInputProps) {
+  const [text, setText] = useState('')
+  const [activeMode, setActiveMode] = useState<AgentMode>('normal')
+  const [showAdapterMenu, setShowAdapterMenu] = useState(false)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const isComposingRef = useRef(false)
+  const adapterMenuRef = useRef<HTMLDivElement>(null)
+
+  const { currentAdapter, availableAdapters, fetchAdapters, switchAdapter } = useAdapterStore()
+
+  useEffect(() => {
+    fetchAdapters()
+  }, [fetchAdapters])
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        adapterMenuRef.current &&
+        !adapterMenuRef.current.contains(e.target as Node)
+      ) {
+        setShowAdapterMenu(false)
+      }
+    }
+    if (showAdapterMenu) {
+      document.addEventListener('mousedown', handleClickOutside)
+      return () => document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showAdapterMenu])
+
+  const resetHeight = () => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'
+    }
+  }
+
+  const doSend = useCallback(
+    (command: ParsedCommand | { type: 'user_input'; text: string; mode?: AgentMode }) => {
+      if (command.type === 'user_input') {
+        sendMessage({
+          type: 'user_input',
+          payload: {
+            text: command.text,
+            attachments: [],
+            interrupt_before_send: false,
+            mode: command.mode ?? activeMode,
+          },
+        })
+      } else {
+        sendMessage({
+          type: 'client_command',
+          payload: {
+            command: command.command,
+            args: command.args,
+          },
+        })
+      }
+      setText('')
+      setActiveMode('normal')
+      resetHeight()
+    },
+    [sendMessage, activeMode]
+  )
+
+  const handleSend = useCallback(() => {
+    const trimmed = text.trim()
+    if (!trimmed) return
+
+    const slash = parseSlashCommand(trimmed)
+    if (slash) {
+      doSend(slash)
+      return
+    }
+
+    doSend({ type: 'user_input', text: trimmed })
+  }, [text, doSend])
+
+  const handleInterrupt = useCallback(() => {
+    sendMessage({ type: 'interrupt' })
+  }, [sendMessage])
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey && !isComposingRef.current) {
+      e.preventDefault()
+      handleSend()
+    }
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setText(e.target.value)
+    const target = e.target
+    target.style.height = 'auto'
+    target.style.height = `${Math.min(target.scrollHeight, 5 * 24)}px`
+  }
+
+  const handleCdClick = () => {
+    const path = window.prompt('输入要切换的工作目录路径：')
+    if (path?.trim()) {
+      sendMessage({
+        type: 'client_command',
+        payload: { command: 'change_working_dir', args: path.trim() },
+      })
+    }
+  }
+
+  const handleSessionsClick = () => {
+    sendMessage({
+      type: 'client_command',
+      payload: { command: 'list_kimi_sessions' },
+    })
+  }
+
+  const handleAdapterChange = (id: string) => {
+    switchAdapter(id)
+    sendMessage({
+      type: 'client_command',
+      payload: { command: 'switch_adapter', args: id },
+    })
+    setShowAdapterMenu(false)
+  }
+
+  const enabledAdapters = availableAdapters.filter((a) => a.enabled)
+
+  return (
+    <div className="flex flex-col border-t border-elaw-subtle-border bg-elaw-panel-bg px-4 py-3 backdrop-blur-xl">
+      <QuickActionBar
+        activeMode={activeMode}
+        onSetMode={setActiveMode}
+        onCdClick={handleCdClick}
+        onSessionsClick={handleSessionsClick}
+      />
+      <div className="flex items-end gap-2">
+        <div className="relative" ref={adapterMenuRef}>
+          <button
+            type="button"
+            onClick={() => setShowAdapterMenu((v) => !v)}
+            className="flex items-center gap-1.5 rounded-full border border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2 text-xs font-bold text-elaw-text-secondary transition-all hover:border-elaw-primary/50"
+            aria-label="选择 Agent"
+            title="选择 Agent"
+          >
+            <Bot className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">{currentAdapter || 'Agent'}</span>
+            <ChevronDown className="h-3 w-3" />
+          </button>
+          {showAdapterMenu && (
+            <div className="absolute bottom-full left-0 z-50 mb-2 w-48 rounded-xl border border-elaw-subtle-border bg-elaw-glass-bg p-1 shadow-xl backdrop-blur-xl">
+              {enabledAdapters.map((a) => (
+                <button
+                  key={a.adapter_id}
+                  type="button"
+                  onClick={() => handleAdapterChange(a.adapter_id)}
+                  className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs transition-colors ${
+                    a.adapter_id === currentAdapter
+                      ? 'bg-elaw-primary/15 text-elaw-primary'
+                      : 'text-elaw-text-secondary hover:bg-elaw-glass-highlight'
+                  }`}
+                >
+                  <span>{a.adapter_id}</span>
+                  {a.supports_model && (
+                    <span className="rounded bg-elaw-glass-highlight px-1 text-[10px] text-elaw-text-secondary">
+                      model
+                    </span>
+                  )}
+                </button>
+              ))}
+              {enabledAdapters.length === 0 && (
+                <div className="px-3 py-2 text-xs text-elaw-text-secondary">无可用 Agent</div>
+              )}
+            </div>
+          )}
+        </div>
+
+        <button
+          type="button"
+          className="rounded-full p-2 text-elaw-text-secondary transition-colors hover:bg-elaw-glass-highlight"
+          aria-label="添加附件"
+          title="添加附件"
+        >
+          <Paperclip className="h-5 w-5" />
+        </button>
+
+        <textarea
+          ref={textareaRef}
+          value={text}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          onCompositionStart={() => {
+            isComposingRef.current = true
+          }}
+          onCompositionEnd={() => {
+            isComposingRef.current = false
+          }}
+          rows={computeRows(text)}
+          placeholder="输入消息… 支持 / 快捷指令"
+          className="max-h-32 min-h-11 flex-1 resize-none rounded-2xl border border-elaw-subtle-border bg-elaw-glass-highlight px-4 py-2.5 text-sm text-elaw-text-primary outline-none placeholder:text-elaw-text-secondary/70 focus:border-elaw-primary focus:ring-2 focus:ring-elaw-primary/30"
+        />
+
+        <button
+          type="button"
+          onClick={handleInterrupt}
+          className="rounded-full p-2 text-elaw-danger transition-colors hover:bg-elaw-danger/10"
+          aria-label="中断"
+          title="中断"
+        >
+          <Zap className="h-5 w-5" />
+        </button>
+
+        <button
+          type="button"
+          onClick={handleSend}
+          disabled={!text.trim()}
+          className="rounded-full bg-elaw-primary p-2.5 text-white shadow-md transition-all hover:brightness-110 active:translate-y-px disabled:opacity-50"
+          aria-label="发送"
+        >
+          <Send className="h-5 w-5" />
+        </button>
+      </div>
+    </div>
+  )
+}
