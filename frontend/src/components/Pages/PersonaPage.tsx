@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { User, Save, Upload, Check } from 'lucide-react'
 
 interface PersonaInfo {
@@ -7,7 +7,11 @@ interface PersonaInfo {
   description?: string
 }
 
-export default function PersonaPage() {
+interface PersonaPageProps {
+  onCloseGuardChange?: (guard: () => boolean) => void
+}
+
+export default function PersonaPage({ onCloseGuardChange }: PersonaPageProps) {
   const [personas, setPersonas] = useState<PersonaInfo[]>([])
   const [selectedPersona, setSelectedPersona] = useState<string>('exusiai')
   const [personaYaml, setPersonaYaml] = useState<string>('')
@@ -15,7 +19,6 @@ export default function PersonaPage() {
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [corpusFile, setCorpusFile] = useState<File | null>(null)
-  const isMounted = useRef(false)
 
   useEffect(() => {
     fetch('/api/personas')
@@ -24,7 +27,7 @@ export default function PersonaPage() {
         const list = Array.isArray(data) ? data : []
         setPersonas(list)
         const first = list[0]?.id || 'exusiai'
-        setSelectedPersona((prev) => (prev || first))
+        setSelectedPersona((prev) => prev || first)
       })
       .catch(() => setPersonas([]))
   }, [])
@@ -44,19 +47,21 @@ export default function PersonaPage() {
       })
   }, [selectedPersona])
 
-  useEffect(() => {
-    isMounted.current = true
-  }, [])
-
   const isDirty = personaYaml !== loadedYaml
 
-  const confirmIfDirty = () => {
-    if (!isDirty) return true
-    return window.confirm('当前角色的 YAML 有未保存的修改，确定要放弃吗？')
-  }
+  useEffect(() => {
+    const guard = () => {
+      if (!isDirty) return true
+      return window.confirm('当前角色的 YAML 有未保存的修改，确定要放弃吗？')
+    }
+    onCloseGuardChange?.(guard)
+    return () => onCloseGuardChange?.(() => true)
+  }, [isDirty, onCloseGuardChange])
 
   const handlePersonaChange = (id: string) => {
-    if (!confirmIfDirty()) return
+    if (isDirty && !window.confirm('当前角色的 YAML 有未保存的修改，确定要放弃吗？')) {
+      return
+    }
     setSelectedPersona(id)
     setMessage(null)
     setCorpusFile(null)
@@ -188,5 +193,3 @@ export default function PersonaPage() {
     </div>
   )
 }
-
-export { PersonaPage }
