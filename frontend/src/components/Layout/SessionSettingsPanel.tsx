@@ -54,9 +54,9 @@ export default function SessionSettingsPanel({ sendMessage, className = '' }: Se
       setTitle(session.title)
       setSelectedPersona(session.persona_id)
       setWorkingDir(session.working_dir ?? '')
-      setSelectedAdapter(session.adapter_id ?? selectedAdapter)
+      setSelectedAdapter((prev) => session.adapter_id ?? prev)
     }
-  }, [session, selectedAdapter])
+  }, [session])
 
   const showMessage = (text: string) => {
     setMessage(text)
