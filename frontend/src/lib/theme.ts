@@ -1,22 +1,22 @@
 import type { Theme } from '@/types/protocol'
 
 export const DEFAULT_THEME: Theme = {
-  id: 'paseo_dark',
-  name: 'Paseo 暗色',
+  id: 'default_dark',
+  name: '默认暗色',
   mode: 'dark',
   fonts: {
     body: '"Inter", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif',
     code: '"JetBrains Mono", "Fira Code", "SF Mono", monospace',
   },
   colors: {
-    primary: '#6366f1',
-    primaryHover: '#818cf8',
-    accent: '#8b5cf6',
-    background: '#0a0a0b',
-    chatBackground: '#0f0f11',
-    userBubble: '#6366f1',
-    agentBubbleLight: '#f5f5f7',
-    agentBubbleDark: '#141416',
+    primary: '#38bdf8',
+    primaryHover: '#7dd3fc',
+    accent: '#0ea5e9',
+    background: '#0b0c10',
+    chatBackground: '#111318',
+    userBubble: '#38bdf8',
+    agentBubbleLight: '#ffffff',
+    agentBubbleDark: 'rgba(255, 255, 255, 0.04)',
     textPrimaryLight: '#1d1d1f',
     textPrimaryDark: '#f5f5f7',
     textSecondary: '#9ca3af',
@@ -26,11 +26,11 @@ export const DEFAULT_THEME: Theme = {
     codeBackgroundLight: '#f4f4f5',
     codeBackgroundDark: '#0c0c0e',
     borderLight: '#e5e5e7',
-    borderDark: 'rgba(255, 255, 255, 0.06)',
+    borderDark: 'rgba(255, 255, 255, 0.08)',
   },
   assets: {
-    manifestThemeColor: '#0a0a0b',
-    manifestBackgroundColor: '#0a0a0b',
+    manifestThemeColor: '#0b0c10',
+    manifestBackgroundColor: '#0b0c10',
   },
 }
 
@@ -69,8 +69,24 @@ export function applyTheme(theme: Partial<Theme> | Theme): void {
     '--dionysus-border': dark
       ? fullTheme.colors.borderDark
       : fullTheme.colors.borderLight,
-    '--dionysus-panel-bg': dark ? 'rgba(20, 20, 22, 0.75)' : 'rgba(255,255,255,0.8)',
-    '--dionysus-subtle-border': dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)',
+    '--dionysus-panel-bg': dark
+      ? 'rgba(255, 255, 255, 0.04)'
+      : 'rgba(255, 255, 255, 0.72)',
+    '--dionysus-subtle-border': dark
+      ? 'rgba(255, 255, 255, 0.08)'
+      : 'rgba(0, 0, 0, 0.06)',
+    '--dionysus-glass-bg': dark
+      ? 'rgba(255, 255, 255, 0.04)'
+      : 'rgba(255, 255, 255, 0.72)',
+    '--dionysus-glass-border': dark
+      ? 'rgba(255, 255, 255, 0.08)'
+      : 'rgba(0, 0, 0, 0.06)',
+    '--dionysus-glass-highlight': dark
+      ? 'rgba(255, 255, 255, 0.06)'
+      : 'rgba(255, 255, 255, 0.9)',
+    '--dionysus-glow': dark
+      ? '0 0 0 1px rgba(56, 189, 248, 0.15), 0 8px 32px rgba(0, 0, 0, 0.45)'
+      : '0 0 0 1px rgba(37, 99, 235, 0.1), 0 8px 32px rgba(0, 0, 0, 0.1)',
     '--dionysus-status-online': fullTheme.colors.success,
     '--dionysus-status-busy': '#f59e0b',
     '--dionysus-status-offline': fullTheme.colors.danger,
