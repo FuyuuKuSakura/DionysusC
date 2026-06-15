@@ -16,7 +16,7 @@ interface ContextMenuState {
 }
 
 function latestMessagePreview(session: Session): string {
-  const last = session.messages.at(-1)
+  const last = session.messages[session.messages.length - 1]
   if (!last) return '暂无消息'
   const text = last.content.slice(0, 32)
   return text.length < last.content.length ? `${text}…` : text

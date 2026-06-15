@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Bot, Save, Check } from 'lucide-react'
+import { Bot, Save } from 'lucide-react'
 
 interface AgentConfig {
   default: string
