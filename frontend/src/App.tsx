@@ -230,7 +230,7 @@ function App() {
   )
 
   return (
-    <div className="relative h-full w-full overflow-hidden bg-dionysus-background">
+    <div className="relative h-full w-full overflow-hidden bg-dionysus-chat-bg">
       {/* Wallpaper layer */}
       {wallpaperUrl && (
         <div

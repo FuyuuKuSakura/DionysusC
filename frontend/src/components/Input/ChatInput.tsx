@@ -149,18 +149,18 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
   }
 
   const iconButtonClass =
-    'rounded-lg p-1 text-dionysus-text-secondary transition-colors hover:bg-dionysus-glass-highlight hover:text-dionysus-text-primary'
+    'rounded-lg p-0.5 text-dionysus-text-secondary transition-colors hover:bg-dionysus-glass-highlight hover:text-dionysus-text-primary'
 
   const activeIconClass =
-    'rounded-lg p-1 text-dionysus-primary transition-colors hover:bg-dionysus-glass-highlight'
+    'rounded-lg p-0.5 text-dionysus-primary transition-colors hover:bg-dionysus-glass-highlight'
 
   const historyMessages = messages.slice(-historyLimit)
 
   return (
-    <div className="relative flex flex-col border border-transparent bg-dionysus-background/10 px-3 py-3 backdrop-blur-xl">
+    <div className="relative flex flex-col border border-transparent bg-dionysus-background/10 px-3 py-6 backdrop-blur-xl">
         {/* Top toolbar */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-0.5">
+          <div className="flex items-center gap-0">
             <button
               type="button"
               onClick={() => toggleMode('plan')}
