@@ -24,7 +24,7 @@ function isServerMessage(data: unknown): data is ServerMessage {
 
 function App() {
   const { currentTheme } = useThemeStore()
-  const { stylePreset, fontSize } = useSettingsStore()
+  const { fontSize } = useSettingsStore()
 
   useEffect(() => {
     applyTheme(currentTheme ?? DEFAULT_THEME)
@@ -32,9 +32,8 @@ function App() {
 
   useEffect(() => {
     const root = document.documentElement
-    root.setAttribute('data-style-preset', stylePreset)
     root.setAttribute('data-font-size', fontSize)
-  }, [stylePreset, fontSize])
+  }, [fontSize])
 
   // Expose store for end-to-end / smoke testing only in development builds.
   if (import.meta.env.DEV) {

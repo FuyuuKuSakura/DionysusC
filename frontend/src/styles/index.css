@@ -12,14 +12,6 @@
     color: var(--dionysus-text-primary);
   }
 
-  [data-theme-id="dark_glass"] body {
-    background: radial-gradient(ellipse at 20% 0%, #1e1b4b 0%, #0f172a 45%, #020617 100%);
-  }
-
-  [data-theme-id="dark_glass"] #root {
-    background-color: transparent;
-  }
-
   * {
     @apply box-border;
   }

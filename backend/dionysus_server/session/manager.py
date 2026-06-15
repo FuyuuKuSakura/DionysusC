@@ -706,6 +706,9 @@ class SessionManager:
         adapter = self._session_adapters.get(session_id)
         if adapter is not None:
             return adapter.agent_id
+        session = self.active_sessions.get(session_id)
+        if session is not None and session.adapter_id is not None:
+            return session.adapter_id
         return self._config.agent_adapter.default
 
     async def update_adapter_config(
@@ -723,11 +726,16 @@ class SessionManager:
         return True
 
     async def switch_adapter(self, session_id: str, adapter_id: str) -> bool:
-        """Switch the active adapter for a session."""
+        """Switch the active adapter for a session and persist it."""
         try:
             self.adapters.get_adapter(adapter_id)
         except ValueError:
             return False
+
+        session = await self.get_session(session_id)
+        if session is not None:
+            session.adapter_id = adapter_id
+            await self._store.update_session(session)
 
         await self.close_adapter(session_id)
         self._session_adapters.pop(session_id, None)

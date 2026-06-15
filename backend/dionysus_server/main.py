@@ -190,6 +190,13 @@ def create_app() -> FastAPI:
             content={"ok": True, "default": config.agent_adapter.default}
         )
 
+    @app.get("/api/server/info")
+    async def server_info(request: Request) -> JSONResponse:
+        """Return the URL clients can use to reach this server."""
+        host = request.headers.get("host", f"{config.server.host}:{config.server.port}")
+        scheme = request.headers.get("x-forwarded-proto", "http")
+        return JSONResponse(content={"url": f"{scheme}://{host}"})
+
     manager = SessionManager(config)
 
     @app.on_event("startup")
