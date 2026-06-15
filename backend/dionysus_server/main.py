@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
+import io
 from pathlib import Path
 from typing import Any
 
+import qrcode
 import structlog
 import yaml
 from fastapi import FastAPI, File, Request, UploadFile, WebSocket, WebSocketDisconnect
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from dionysus_server.config import get_config_dir, load_config
