@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
-import { Plus, Trash2, MessageSquare, Pencil } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Plus, Trash2, Pencil } from 'lucide-react'
 import { useChatStore } from '@/stores/chatStore'
 import { useLayoutStore } from '@/stores/layoutStore'
 import MobileSessionListHeader from './MobileSessionListHeader'
@@ -15,43 +15,11 @@ interface ContextMenuState {
   sessionId: string
 }
 
-function formatTime(timestamp: number): string {
-  const date = new Date(timestamp)
-  return date.toLocaleString('zh-CN', {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
-
-function statusColor(status: Session['status']): string {
-  switch (status) {
-    case 'processing':
-    case 'streaming':
-      return 'bg-dionysus-status-busy'
-    case 'interrupted':
-      return 'bg-dionysus-status-offline'
-    default:
-      return 'bg-dionysus-status-online'
-  }
-}
-
-function groupSessions(sessions: Session[]) {
-  const now = Date.now()
-  const oneDay = 24 * 60 * 60 * 1000
-  const groups: { label: string; items: Session[] }[] = []
-  const today: Session[] = []
-  const earlier: Session[] = []
-
-  sessions.forEach((s) => {
-    if (now - s.updated_at < oneDay) today.push(s)
-    else earlier.push(s)
-  })
-
-  if (today.length) groups.push({ label: '今天', items: today })
-  if (earlier.length) groups.push({ label: '更早', items: earlier })
-  return groups
+function latestMessagePreview(session: Session): string {
+  const last = session.messages.at(-1)
+  if (!last) return '暂无消息'
+  const text = last.content.slice(0, 32)
+  return text.length < last.content.length ? `${text}…` : text
 }
 
 export default function SessionList({ sendMessage }: SessionListProps) {
@@ -68,8 +36,6 @@ export default function SessionList({ sendMessage }: SessionListProps) {
   const [editingTitle, setEditingTitle] = useState('')
   const menuRef = useRef<HTMLDivElement>(null)
 
-  const groups = useMemo(() => groupSessions(sessions), [sessions])
-
   const handleNewSession = () => {
     sendMessage?.({ type: 'new_session', payload: { persona_id: 'exusiai' } })
   }
@@ -77,12 +43,6 @@ export default function SessionList({ sendMessage }: SessionListProps) {
   const handleSelect = (id: string) => {
     setCurrentSession(id)
     setMobileView('chat')
-  }
-
-  const handleDelete = (e: React.MouseEvent, id: string) => {
-    e.stopPropagation()
-    deleteSession(id)
-    setContextMenu(null)
   }
 
   const handleContextMenu = (e: React.MouseEvent, session: Session) => {
@@ -157,94 +117,68 @@ export default function SessionList({ sendMessage }: SessionListProps) {
             暂无会话
           </div>
         ) : (
-          <div className="space-y-4">
-            {groups.map((group) => (
-              <div key={group.label}>
-                <div className="mb-2 px-2 text-xs font-bold text-dionysus-text-secondary">
-                  {group.label}
-                </div>
-                <ul className="space-y-1.5">
-                  {group.items.map((session) => (
-                    <li key={session.id}>
-                      <div
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => handleSelect(session.id)}
-                        onContextMenu={(e) => handleContextMenu(e, session)}
+          <ul className="space-y-1.5">
+            {sessions.map((session) => {
+              const isActive = currentSessionId === session.id
+              return (
+                <li key={session.id}>
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => handleSelect(session.id)}
+                    onContextMenu={(e) => handleContextMenu(e, session)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        handleSelect(session.id)
+                      }
+                    }}
+                    className={`
+                      group relative flex w-full flex-col rounded-xl border px-3 py-2 text-left transition-all
+                      ${
+                        isActive
+                          ? 'border-dionysus-primary/30 bg-dionysus-primary/10'
+                          : 'border-transparent bg-dionysus-glass-highlight/50 hover:border-dionysus-subtle-border hover:bg-dionysus-glass-highlight'
+                      }
+                    `}
+                  >
+                    {isActive && (
+                      <span className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full bg-dionysus-primary" />
+                    )}
+                    {editingId === session.id ? (
+                      <input
+                        type="text"
+                        value={editingTitle}
+                        onChange={(e) => setEditingTitle(e.target.value)}
+                        onBlur={commitRename}
                         onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
+                          if (e.key === 'Enter') {
                             e.preventDefault()
-                            handleSelect(session.id)
+                            commitRename()
+                          } else if (e.key === 'Escape') {
+                            e.preventDefault()
+                            cancelRename()
                           }
                         }}
-                        className={`
-                          group flex w-full items-center gap-3 rounded-xl border px-3 py-2 text-left transition-all
-                          ${
-                            currentSessionId === session.id
-                              ? 'border-dionysus-primary/50 bg-dionysus-primary/10'
-                              : 'border-transparent bg-dionysus-glass-highlight/50 hover:border-dionysus-subtle-border hover:bg-dionysus-glass-highlight'
-                          }
-                        `}
-                      >
-                        <span
-                          className={`h-2 w-2 flex-shrink-0 rounded-full ${statusColor(session.status)}`}
-                          title={session.status}
-                        />
-                        <MessageSquare
-                          className={`h-4 w-4 flex-shrink-0 ${
-                            currentSessionId === session.id
-                              ? 'text-dionysus-primary'
-                              : 'text-dionysus-text-secondary'
-                          }`}
-                        />
-                        <div className="min-w-0 flex-1">
-                          {editingId === session.id ? (
-                            <input
-                              type="text"
-                              value={editingTitle}
-                              onChange={(e) => setEditingTitle(e.target.value)}
-                              onBlur={commitRename}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                  e.preventDefault()
-                                  commitRename()
-                                } else if (e.key === 'Escape') {
-                                  e.preventDefault()
-                                  cancelRename()
-                                }
-                              }}
-                              onClick={(e) => e.stopPropagation()}
-                              autoFocus
-                              className="w-full rounded border border-dionysus-primary bg-dionysus-glass-highlight px-1.5 py-0.5 text-sm text-dionysus-text-primary outline-none"
-                            />
-                          ) : (
-                            <>
-                              <div className="truncate text-sm font-medium text-dionysus-text-primary">
-                                {session.title}
-                              </div>
-                              <div className="text-xs text-dionysus-text-secondary">
-                                {formatTime(session.updated_at)}
-                              </div>
-                            </>
-                          )}
+                        onClick={(e) => e.stopPropagation()}
+                        autoFocus
+                        className="w-full rounded border border-dionysus-primary bg-dionysus-glass-highlight px-1.5 py-0.5 text-sm text-dionysus-text-primary outline-none"
+                      />
+                    ) : (
+                      <>
+                        <div className="truncate text-sm font-medium text-dionysus-text-primary">
+                          {session.title}
                         </div>
-                        {editingId !== session.id && (
-                          <button
-                            type="button"
-                            onClick={(e) => handleDelete(e, session.id)}
-                            className="rounded p-1 text-dionysus-text-secondary opacity-0 group-hover:opacity-100 hover:text-dionysus-danger focus:opacity-100"
-                            aria-label="删除会话"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        )}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
+                        <div className="truncate text-xs text-dionysus-text-secondary">
+                          {latestMessagePreview(session)}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
         )}
       </div>
 
