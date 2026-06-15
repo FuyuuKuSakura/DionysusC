@@ -522,7 +522,6 @@ export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, init
                   personas={personas}
                   adapterOptions={adapterOptions}
                   sendMessage={sendMessage}
-                  onClose={onClose}
                 />
               )}
 
