@@ -384,6 +384,8 @@ class Session(BaseModel):
     id: str
     title: str = "新会话"
     persona_id: str = "exusiai"
+    adapter_id: str | None = None
+    working_dir: str | None = None
     status: SessionStatus = SessionStatus.IDLE
     created_at: datetime = Field(default_factory=_utc_now)
     updated_at: datetime = Field(default_factory=_utc_now)

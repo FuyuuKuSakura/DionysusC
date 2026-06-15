@@ -57,10 +57,15 @@ class SessionStore:
                     id TEXT PRIMARY KEY,
                     title TEXT NOT NULL,
                     persona_id TEXT NOT NULL,
+                    adapter_id TEXT,
+                    working_dir TEXT,
                     status TEXT NOT NULL,
                     created_at TEXT NOT NULL,
                     updated_at TEXT NOT NULL
                 );
+
+                ALTER TABLE sessions ADD COLUMN IF NOT EXISTS adapter_id TEXT;
+                ALTER TABLE sessions ADD COLUMN IF NOT EXISTS working_dir TEXT;
 
                 CREATE TABLE IF NOT EXISTS messages (
                     id TEXT PRIMARY KEY,
@@ -85,6 +90,8 @@ class SessionStore:
             id=row["id"],
             title=row["title"],
             persona_id=row["persona_id"],
+            adapter_id=row["adapter_id"],
+            working_dir=row["working_dir"],
             status=SessionStatus(row["status"]),
             created_at=_iso_to_dt(row["created_at"]),
             updated_at=_iso_to_dt(row["updated_at"]),
@@ -117,13 +124,15 @@ class SessionStore:
             conn.row_factory = aiosqlite.Row
             await conn.execute(
                 """
-                INSERT INTO sessions (id, title, persona_id, status, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?)
+                INSERT INTO sessions (id, title, persona_id, adapter_id, working_dir, status, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     session.id,
                     session.title,
                     session.persona_id,
+                    session.adapter_id,
+                    session.working_dir,
                     session.status.value,
                     _dt_to_iso(session.created_at),
                     _dt_to_iso(session.updated_at),
