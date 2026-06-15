@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X, Palette, User, Bot, Save, Check, Upload, Layers } from 'lucide-react'
-import { useSettingsStore, type StylePreset, type FontSize } from '@/stores/settingsStore'
+import { useSettingsStore, type FontSize } from '@/stores/settingsStore'
 import { useLive2DStore } from '@/stores/live2dStore'
 import { useChatStore } from '@/stores/chatStore'
 import { panelWidthClasses } from '@/lib/layout'
