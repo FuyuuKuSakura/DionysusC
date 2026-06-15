@@ -122,11 +122,13 @@ export default function Layout({ sendMessage, connected = false }: LayoutProps) 
             </OverlayPage>
           </main>
         </div>
-        <SessionSettingsPanel
-          sendMessage={sendMessage}
-          className={`${isSessionSettingsOpen ? 'flex' : 'hidden'}`}
-        />
-        <RightPanel />
+        <div className="relative hidden h-full md:flex">
+          <RightPanel />
+          <SessionSettingsPanel
+            sendMessage={sendMessage}
+            open={isSessionSettingsOpen}
+          />
+        </div>
       </div>
 
       {/* Mobile layout */}

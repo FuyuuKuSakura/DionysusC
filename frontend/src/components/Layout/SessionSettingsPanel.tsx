@@ -5,6 +5,7 @@ import { panelWidthClasses } from '@/lib/layout'
 
 interface SessionSettingsPanelProps {
   sendMessage?: (message: unknown) => boolean
+  open?: boolean
   className?: string
 }
 
@@ -15,7 +16,7 @@ interface AdapterCapability {
   working_dir?: string
 }
 
-export default function SessionSettingsPanel({ sendMessage, className = '' }: SessionSettingsPanelProps) {
+export default function SessionSettingsPanel({ sendMessage, open = false, className = '' }: SessionSettingsPanelProps) {
   const { sessions, currentSessionId, renameSession, updateSession } = useChatStore()
   const session = sessions.find((s) => s.id === currentSessionId)
 
@@ -96,7 +97,7 @@ export default function SessionSettingsPanel({ sendMessage, className = '' }: Se
   if (!session) {
     return (
       <aside
-        className={`flex h-full flex-shrink-0 flex-col border-l border-dionysus-subtle-border bg-dionysus-glass-bg backdrop-blur-xl ${panelWidthClasses()} ${className}`}
+        className={`absolute inset-y-0 right-0 z-20 flex h-full flex-col border-l border-dionysus-subtle-border bg-dionysus-background/80 backdrop-blur-xl ${panelWidthClasses()} transition-transform duration-300 ease-in-out ${open ? 'translate-x-0' : 'translate-x-full'} ${className}`}
       >
         <div className="flex h-14 flex-shrink-0 items-center border-b border-dionysus-subtle-border px-4">
           <h2 className="text-base font-semibold text-dionysus-text-primary">会话设置</h2>
@@ -118,7 +119,7 @@ export default function SessionSettingsPanel({ sendMessage, className = '' }: Se
 
   return (
     <aside
-      className={`flex h-full flex-shrink-0 flex-col border-l border-dionysus-subtle-border bg-dionysus-glass-bg backdrop-blur-xl ${panelWidthClasses()} ${className}`}
+      className={`absolute inset-y-0 right-0 z-20 flex h-full flex-col border-l border-dionysus-subtle-border bg-dionysus-background/80 backdrop-blur-xl ${panelWidthClasses()} transition-transform duration-300 ease-in-out ${open ? 'translate-x-0' : 'translate-x-full'} ${className}`}
     >
       <div className="flex h-14 flex-shrink-0 items-center border-b border-dionysus-subtle-border px-4">
         <h2 className="text-base font-semibold text-dionysus-text-primary">会话设置</h2>

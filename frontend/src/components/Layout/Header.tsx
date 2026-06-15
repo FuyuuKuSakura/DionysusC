@@ -1,13 +1,8 @@
-import { useEffect, useState } from 'react'
-import { ArrowLeft, Settings, Download, Check, Sparkles, Bot, LayoutGrid } from 'lucide-react'
+import { useEffect } from 'react'
+import { ArrowLeft, Settings, Sparkles, Bot, LayoutGrid } from 'lucide-react'
 import { useChatStore } from '@/stores/chatStore'
 import { useAdapterStore } from '@/stores/adapterStore'
 import { useLayoutStore } from '@/stores/layoutStore'
-
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<{ outcome: 'accepted' | 'dismissed' }>
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
-}
 
 interface HeaderProps {
   onSettingsClick: () => void
@@ -29,39 +24,6 @@ export default function Header({ onSettingsClick, showBack = false, connected = 
 
   const currentAdapterLabel =
     availableAdapters.find((a) => a.adapter_id === currentAdapter)?.adapter_id ?? currentAdapter
-
-  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null)
-  const [installed, setInstalled] = useState(false)
-
-  useEffect(() => {
-    const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault()
-      setInstallPrompt(e as BeforeInstallPromptEvent)
-    }
-    const handleAppInstalled = () => {
-      setInstalled(true)
-      setInstallPrompt(null)
-    }
-
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-    window.addEventListener('appinstalled', handleAppInstalled)
-    return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-      window.removeEventListener('appinstalled', handleAppInstalled)
-    }
-  }, [])
-
-  const handleInstallPWA = async () => {
-    if (!installPrompt) {
-      alert('当前浏览器不支持 PWA 安装，或已安装。')
-      return
-    }
-    const result = await installPrompt.prompt()
-    if (result.outcome === 'accepted') {
-      setInstalled(true)
-    }
-    setInstallPrompt(null)
-  }
 
   return (
     <header className="flex h-14 flex-shrink-0 items-center justify-between border-b border-dionysus-glass-border bg-dionysus-background/80 px-4 backdrop-blur-xl">
@@ -100,15 +62,6 @@ export default function Header({ onSettingsClick, showBack = false, connected = 
           />
           <span className="hidden sm:inline">{connected ? '已连接' : '未连接'}</span>
         </div>
-        <button
-          type="button"
-          onClick={handleInstallPWA}
-          className="cel-button p-2 text-dionysus-text-secondary"
-          aria-label="安装 PWA"
-          title={installed ? '已安装' : '安装 PWA'}
-        >
-          {installed ? <Check className="h-5 w-5 text-dionysus-success" /> : <Download className="h-5 w-5" />}
-        </button>
         <button
           type="button"
           onClick={toggleCompanionDrawer}

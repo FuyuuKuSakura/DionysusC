@@ -2,30 +2,8 @@ import { useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import { useChatStore } from '@/stores/chatStore'
-import { useLive2DStore } from '@/stores/live2dStore'
 
 const DEFAULT_GREETING = '我在这里陪着你，有什么需要尽管告诉我~'
-
-function emotionEmoji(emotion: string | null): string {
-  switch (emotion) {
-    case 'happy':
-      return '😊'
-    case 'worried':
-      return '😰'
-    case 'surprised':
-      return '😲'
-    case 'annoyed':
-      return '😤'
-    case 'confident':
-      return '😎'
-    case 'bored':
-      return '😴'
-    case 'neutral':
-      return '🙂'
-    default:
-      return ''
-  }
-}
 
 function TypingDots() {
   return (
@@ -51,7 +29,6 @@ export default function CharacterDialogBox() {
   const companionLine = useChatStore((state) => state.companionLine)
   const companionHistory = useChatStore((state) => state.companionHistory)
   const isStreaming = useChatStore((state) => state.isStreaming)
-  const currentEmotion = useLive2DStore((state) => state.currentEmotion)
 
   const [expanded, setExpanded] = useState(false)
 
@@ -71,14 +48,8 @@ export default function CharacterDialogBox() {
 
   return (
     <div className="relative min-w-0 px-4 pb-4">
-      <div className="mb-1.5 flex items-center justify-between">
-        <div className="inline-flex items-center gap-1 rounded-full border border-dionysus-glass-border bg-dionysus-glass-highlight px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-dionysus-primary">
-          <span>Exusiai</span>
-          {currentEmotion && (
-            <span aria-label={`emotion-${currentEmotion}`}>{emotionEmoji(currentEmotion)}</span>
-          )}
-        </div>
-        {companionHistory.length > 0 && (
+      {companionHistory.length > 0 && (
+        <div className="mb-1.5 flex items-center justify-end">
           <button
             type="button"
             onClick={toggleExpanded}
@@ -95,8 +66,8 @@ export default function CharacterDialogBox() {
               </>
             )}
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="space-y-2">
         <AnimatePresence mode="popLayout">
