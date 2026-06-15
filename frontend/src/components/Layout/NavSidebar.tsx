@@ -15,27 +15,34 @@ const NAV_ITEMS: NavItemDef[] = [
 ]
 
 interface NavSidebarProps {
-  onOpenSettings?: (tab: 'appearance' | 'persona' | 'agent') => void
-  onOpenThemeStudio?: () => void
+  onOpenPalette?: () => void
+  onOpenPersona?: () => void
+  onOpenSystemSettings?: () => void
+  onCloseGlobalPages?: () => void
 }
 
-export default function NavSidebar({ onOpenSettings, onOpenThemeStudio }: NavSidebarProps) {
+export default function NavSidebar({
+  onOpenPalette,
+  onOpenPersona,
+  onOpenSystemSettings,
+  onCloseGlobalPages,
+}: NavSidebarProps) {
   const { activeNav, setActiveNav } = useLayoutStore()
 
   const handleClick = (id: NavItem) => {
     setActiveNav(id)
     switch (id) {
       case 'sessions':
-        // Default page, nothing extra to open
+        onCloseGlobalPages?.()
         break
       case 'themes':
-        onOpenThemeStudio?.()
+        onOpenPalette?.()
         break
       case 'character':
-        onOpenSettings?.('persona')
+        onOpenPersona?.()
         break
       case 'settings':
-        onOpenSettings?.('appearance')
+        onOpenSystemSettings?.()
         break
     }
   }
@@ -46,7 +53,7 @@ export default function NavSidebar({ onOpenSettings, onOpenThemeStudio }: NavSid
       aria-label="主导航"
     >
       <div className="mb-6 flex h-10 w-10 items-center justify-center rounded-xl bg-dionysus-primary text-lg font-bold text-white shadow-md">
-        E
+        D
       </div>
 
       <div className="flex flex-1 flex-col gap-3">

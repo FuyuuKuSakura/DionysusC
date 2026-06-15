@@ -1,5 +1,5 @@
 import { useLayoutStore } from '@/stores/layoutStore'
-import SettingsPanel from './SettingsPanel'
+import SessionSettingsPanel from './SessionSettingsPanel'
 
 interface MobileResourcePanelProps {
   sendMessage: (message: unknown) => boolean
@@ -8,13 +8,18 @@ interface MobileResourcePanelProps {
 export default function MobileResourcePanel({ sendMessage }: MobileResourcePanelProps) {
   const { isResourcePanelOpen, setResourcePanelOpen } = useLayoutStore()
 
+  if (!isResourcePanelOpen) return null
+
   return (
-    <div className="md:hidden">
-      <SettingsPanel
-        isOpen={isResourcePanelOpen}
-        onClose={() => setResourcePanelOpen(false)}
-        initialTab="agent"
+    <div className="fixed inset-0 z-50 flex md:hidden">
+      <div
+        className="flex-1 bg-black/40"
+        onClick={() => setResourcePanelOpen(false)}
+        aria-hidden="true"
+      />
+      <SessionSettingsPanel
         sendMessage={sendMessage}
+        className="h-full border-l border-dionysus-subtle-border bg-dionysus-panel-bg"
       />
     </div>
   )
