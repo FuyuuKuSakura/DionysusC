@@ -462,6 +462,12 @@ class SessionManager:
                 yield msg
             return
 
+        if command == "switch_persona":
+            target = args or text
+            async for msg in self._cmd_switch_persona(session_id, target):
+                yield msg
+            return
+
         self._logger.warning("unknown_client_command", command=command)
         yield SystemNoticeMessage(
             session_id=session_id,

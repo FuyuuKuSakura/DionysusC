@@ -1,7 +1,11 @@
 import { useLayoutStore } from '@/stores/layoutStore'
 import SettingsPanel from './SettingsPanel'
 
-export default function MobileResourcePanel() {
+interface MobileResourcePanelProps {
+  sendMessage: (message: unknown) => boolean
+}
+
+export default function MobileResourcePanel({ sendMessage }: MobileResourcePanelProps) {
   const { isResourcePanelOpen, setResourcePanelOpen } = useLayoutStore()
 
   return (
@@ -10,6 +14,7 @@ export default function MobileResourcePanel() {
         isOpen={isResourcePanelOpen}
         onClose={() => setResourcePanelOpen(false)}
         initialTab="agent"
+        sendMessage={sendMessage}
       />
     </div>
   )
