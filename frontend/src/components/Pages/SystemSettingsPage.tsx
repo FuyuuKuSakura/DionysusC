@@ -47,14 +47,6 @@ export default function SystemSettingsPage() {
 
   const selectedSupportsModel = adapterCapabilities[selectedAdapter]?.supports_model ?? false
 
-  const handleWorkingDirChange = (value: string) => {
-    if (value !== originalWorkingDir) {
-      const confirmed = window.confirm('修改全局 working_dir 会影响所有会话，确定要继续吗？')
-      if (!confirmed) return
-    }
-    setAdapterWorkingDir(value)
-  }
-
   const onAdapterChange = (id: string) => {
     setSelectedAdapter(id)
     const cfg = agentConfig?.adapters[id] || {}
