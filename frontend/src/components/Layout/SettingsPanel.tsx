@@ -241,6 +241,7 @@ export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, init
             <div className="flex border-b border-elaw-subtle-border">
               {[
                 { id: 'appearance', label: '外观', icon: Palette },
+                { id: 'session', label: '会话', icon: Layers },
                 { id: 'persona', label: '角色', icon: User },
                 { id: 'agent', label: 'Agent', icon: Bot },
               ].map(({ id, label, icon: Icon }) => (
@@ -337,6 +338,20 @@ export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, init
                         type="checkbox"
                         checked={live2dEnabled}
                         onChange={(e) => handleLive2dChange(e.target.checked)}
+                        className="peer sr-only"
+                      />
+                      <span className="relative h-6 w-11 rounded-full border-2 border-elaw-subtle-border bg-elaw-chat-bg transition-colors peer-checked:border-elaw-primary peer-checked:bg-elaw-primary after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:shadow-sm after:transition-transform peer-checked:after:translate-x-5" />
+                    </label>
+                  </section>
+
+                  <section>
+                    <div className="mb-3 text-sm font-medium text-elaw-text-primary">界面密度</div>
+                    <label className="flex cursor-pointer items-center justify-between rounded-xl border-2 border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2.5">
+                      <span className="text-sm font-medium text-elaw-text-primary">紧凑模式</span>
+                      <input
+                        type="checkbox"
+                        checked={compactMode}
+                        onChange={(e) => setCompactMode(e.target.checked)}
                         className="peer sr-only"
                       />
                       <span className="relative h-6 w-11 rounded-full border-2 border-elaw-subtle-border bg-elaw-chat-bg transition-colors peer-checked:border-elaw-primary peer-checked:bg-elaw-primary after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:shadow-sm after:transition-transform peer-checked:after:translate-x-5" />
