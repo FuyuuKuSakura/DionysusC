@@ -37,11 +37,9 @@ interface AdapterCapability {
 export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, initialTab, sendMessage }: SettingsPanelProps) {
   const {
     live2dEnabled,
-    stylePreset,
     fontSize,
     compactMode,
     setLive2dEnabled,
-    setStylePreset,
     setFontSize,
     setCompactMode,
   } = useSettingsStore()
@@ -281,30 +279,6 @@ export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, init
                         打开调色盘
                       </button>
                     )}
-                  </section>
-
-                  <section>
-                    <div className="mb-3 text-sm font-medium text-dionysus-text-primary">风格预设</div>
-                    <div className="grid grid-cols-3 gap-2">
-                      {([
-                        { id: 'cel', label: '赛璐珞' },
-                        { id: 'flat', label: '扁平' },
-                        { id: 'contrast', label: '高对比' },
-                      ] as { id: StylePreset; label: string }[]).map(({ id, label }) => (
-                        <button
-                          key={id}
-                          type="button"
-                          onClick={() => setStylePreset(id)}
-                          className={`rounded-xl border-2 px-2 py-2 text-xs font-bold transition-all ${
-                            stylePreset === id
-                              ? 'border-dionysus-primary bg-dionysus-primary/15 text-dionysus-primary'
-                              : 'border-dionysus-subtle-border bg-dionysus-glass-highlight text-dionysus-text-secondary'
-                          }`}
-                        >
-                          {label}
-                        </button>
-                      ))}
-                    </div>
                   </section>
 
                   <section>
