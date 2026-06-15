@@ -19,8 +19,8 @@ export default function ButtonGroup({ options, disabled, onSelect }: ButtonGroup
             rounded-full border px-4 py-2 text-sm font-medium transition-colors
             ${
               disabled
-                ? 'cursor-not-allowed border-elaw-border bg-elaw-agent-bubble text-elaw-text-secondary'
-                : 'border-elaw-primary bg-elaw-primary/10 text-elaw-text-primary hover:bg-elaw-primary hover:text-white'
+                ? 'cursor-not-allowed border-dionysus-border bg-dionysus-agent-bubble text-dionysus-text-secondary'
+                : 'border-dionysus-primary bg-dionysus-primary/10 text-dionysus-text-primary hover:bg-dionysus-primary hover:text-white'
             }
           `}
         >

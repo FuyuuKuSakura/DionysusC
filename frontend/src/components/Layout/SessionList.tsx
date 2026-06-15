@@ -29,11 +29,11 @@ function statusColor(status: Session['status']): string {
   switch (status) {
     case 'processing':
     case 'streaming':
-      return 'bg-elaw-status-busy'
+      return 'bg-dionysus-status-busy'
     case 'interrupted':
-      return 'bg-elaw-status-offline'
+      return 'bg-dionysus-status-offline'
     default:
-      return 'bg-elaw-status-online'
+      return 'bg-dionysus-status-online'
   }
 }
 
@@ -127,7 +127,7 @@ export default function SessionList({ sendMessage }: SessionListProps) {
   return (
     <aside
       className={`
-        flex h-full flex-shrink-0 flex-col border-r border-elaw-subtle-border bg-elaw-panel-bg
+        flex h-full flex-shrink-0 flex-col border-r border-dionysus-subtle-border bg-dionysus-panel-bg
         transition-all duration-300 ease-in-out
         ${isSessionListOpen ? 'w-full md:w-64' : 'w-0 overflow-hidden'}
       `}
@@ -135,15 +135,15 @@ export default function SessionList({ sendMessage }: SessionListProps) {
     >
       <MobileSessionListHeader />
 
-      <div className="hidden h-14 flex-shrink-0 items-center justify-between border-b border-elaw-subtle-border px-4 md:flex">
-        <span className="font-semibold text-elaw-text-primary">会话</span>
+      <div className="hidden h-14 flex-shrink-0 items-center justify-between border-b border-dionysus-subtle-border px-4 md:flex">
+        <span className="font-semibold text-dionysus-text-primary">会话</span>
       </div>
 
       <div className="p-3">
         <button
           type="button"
           onClick={handleNewSession}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-elaw-primary px-4 py-2 text-sm font-bold text-white shadow-md transition-all hover:brightness-110 active:translate-y-px"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-dionysus-primary px-4 py-2 text-sm font-bold text-white shadow-md transition-all hover:brightness-110 active:translate-y-px"
           title="新建会话"
         >
           <Plus className="h-4 w-4" />
@@ -153,14 +153,14 @@ export default function SessionList({ sendMessage }: SessionListProps) {
 
       <div className="flex-1 overflow-y-auto px-3 pb-3 scrollbar-thin">
         {sessions.length === 0 ? (
-          <div className="py-8 text-center text-sm text-elaw-text-secondary">
+          <div className="py-8 text-center text-sm text-dionysus-text-secondary">
             暂无会话
           </div>
         ) : (
           <div className="space-y-4">
             {groups.map((group) => (
               <div key={group.label}>
-                <div className="mb-2 px-2 text-xs font-bold text-elaw-text-secondary">
+                <div className="mb-2 px-2 text-xs font-bold text-dionysus-text-secondary">
                   {group.label}
                 </div>
                 <ul className="space-y-1.5">
@@ -181,8 +181,8 @@ export default function SessionList({ sendMessage }: SessionListProps) {
                           group flex w-full items-center gap-3 rounded-xl border px-3 py-2 text-left transition-all
                           ${
                             currentSessionId === session.id
-                              ? 'border-elaw-primary/50 bg-elaw-primary/10'
-                              : 'border-transparent bg-elaw-glass-highlight/50 hover:border-elaw-subtle-border hover:bg-elaw-glass-highlight'
+                              ? 'border-dionysus-primary/50 bg-dionysus-primary/10'
+                              : 'border-transparent bg-dionysus-glass-highlight/50 hover:border-dionysus-subtle-border hover:bg-dionysus-glass-highlight'
                           }
                         `}
                       >
@@ -193,8 +193,8 @@ export default function SessionList({ sendMessage }: SessionListProps) {
                         <MessageSquare
                           className={`h-4 w-4 flex-shrink-0 ${
                             currentSessionId === session.id
-                              ? 'text-elaw-primary'
-                              : 'text-elaw-text-secondary'
+                              ? 'text-dionysus-primary'
+                              : 'text-dionysus-text-secondary'
                           }`}
                         />
                         <div className="min-w-0 flex-1">
@@ -215,14 +215,14 @@ export default function SessionList({ sendMessage }: SessionListProps) {
                               }}
                               onClick={(e) => e.stopPropagation()}
                               autoFocus
-                              className="w-full rounded border border-elaw-primary bg-elaw-glass-highlight px-1.5 py-0.5 text-sm text-elaw-text-primary outline-none"
+                              className="w-full rounded border border-dionysus-primary bg-dionysus-glass-highlight px-1.5 py-0.5 text-sm text-dionysus-text-primary outline-none"
                             />
                           ) : (
                             <>
-                              <div className="truncate text-sm font-medium text-elaw-text-primary">
+                              <div className="truncate text-sm font-medium text-dionysus-text-primary">
                                 {session.title}
                               </div>
-                              <div className="text-xs text-elaw-text-secondary">
+                              <div className="text-xs text-dionysus-text-secondary">
                                 {formatTime(session.updated_at)}
                               </div>
                             </>
@@ -232,7 +232,7 @@ export default function SessionList({ sendMessage }: SessionListProps) {
                           <button
                             type="button"
                             onClick={(e) => handleDelete(e, session.id)}
-                            className="rounded p-1 text-elaw-text-secondary opacity-0 group-hover:opacity-100 hover:text-elaw-danger focus:opacity-100"
+                            className="rounded p-1 text-dionysus-text-secondary opacity-0 group-hover:opacity-100 hover:text-dionysus-danger focus:opacity-100"
                             aria-label="删除会话"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -251,13 +251,13 @@ export default function SessionList({ sendMessage }: SessionListProps) {
       {contextMenu && (
         <div
           ref={menuRef}
-          className="fixed z-[100] min-w-[8rem] rounded-lg border border-elaw-subtle-border bg-elaw-glass-bg p-1 shadow-lg backdrop-blur-md"
+          className="fixed z-[100] min-w-[8rem] rounded-lg border border-dionysus-subtle-border bg-dionysus-glass-bg p-1 shadow-lg backdrop-blur-md"
           style={{ left: contextMenu.x, top: contextMenu.y }}
         >
           <button
             type="button"
             onClick={startRename}
-            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-elaw-text-primary hover:bg-elaw-primary/10"
+            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-dionysus-text-primary hover:bg-dionysus-primary/10"
           >
             <Pencil className="h-3.5 w-3.5" />
             重命名
@@ -265,7 +265,7 @@ export default function SessionList({ sendMessage }: SessionListProps) {
           <button
             type="button"
             onClick={() => deleteSession(contextMenu.sessionId)}
-            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-elaw-danger hover:bg-elaw-danger/10"
+            className="flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-dionysus-danger hover:bg-dionysus-danger/10"
           >
             <Trash2 className="h-3.5 w-3.5" />
             删除

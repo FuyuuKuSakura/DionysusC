@@ -42,10 +42,10 @@ export default function NavSidebar({ onOpenSettings, onOpenThemeStudio }: NavSid
 
   return (
     <nav
-      className="flex h-full w-16 flex-shrink-0 flex-col items-center border-r border-elaw-subtle-border bg-elaw-panel-bg py-4"
+      className="flex h-full w-16 flex-shrink-0 flex-col items-center border-r border-dionysus-subtle-border bg-dionysus-panel-bg py-4"
       aria-label="主导航"
     >
-      <div className="mb-6 flex h-10 w-10 items-center justify-center rounded-xl bg-elaw-primary text-lg font-bold text-white shadow-md">
+      <div className="mb-6 flex h-10 w-10 items-center justify-center rounded-xl bg-dionysus-primary text-lg font-bold text-white shadow-md">
         E
       </div>
 
@@ -64,14 +64,14 @@ export default function NavSidebar({ onOpenSettings, onOpenThemeStudio }: NavSid
                 group relative flex h-11 w-11 items-center justify-center rounded-xl transition-all
                 ${
                   isActive
-                    ? 'bg-elaw-primary/15 text-elaw-primary'
-                    : 'text-elaw-text-secondary hover:bg-elaw-glass-highlight hover:text-elaw-text-primary'
+                    ? 'bg-dionysus-primary/15 text-dionysus-primary'
+                    : 'text-dionysus-text-secondary hover:bg-dionysus-glass-highlight hover:text-dionysus-text-primary'
                 }
               `}
             >
               <Icon className="h-5 w-5" />
               {isActive && (
-                <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-elaw-primary" />
+                <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-dionysus-primary" />
               )}
             </button>
           )

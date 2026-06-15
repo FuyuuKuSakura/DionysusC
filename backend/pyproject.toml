@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "elaw-server"
+name = "dionysus-server"
 version = "0.1.0"
-description = "Exusiai Live Agent WebUI - backend server"
+description = "Dionysus Agent Companion - backend server"
 requires-python = ">=3.10"
 dependencies = [
     "fastapi>=0.110.0",
@@ -27,7 +27,7 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["elaw_server*"]
+include = ["dionysus_server*"]
 
 [tool.ruff]
 line-length = 100

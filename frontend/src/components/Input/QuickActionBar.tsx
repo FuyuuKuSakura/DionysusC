@@ -37,8 +37,8 @@ export default function QuickActionBar({
               flex flex-shrink-0 items-center gap-1.5 rounded-full border-2 px-3 py-1 text-xs font-bold transition-all
               ${
                 active
-                  ? 'border-elaw-primary bg-elaw-primary/20 text-elaw-primary'
-                  : 'border-elaw-glass-border bg-elaw-glass-highlight text-elaw-text-secondary hover:border-elaw-primary/50'
+                  ? 'border-dionysus-primary bg-dionysus-primary/20 text-dionysus-primary'
+                  : 'border-dionysus-glass-border bg-dionysus-glass-highlight text-dionysus-text-secondary hover:border-dionysus-primary/50'
               }
             `}
             title={
@@ -56,7 +56,7 @@ export default function QuickActionBar({
       <button
         type="button"
         onClick={onCdClick}
-        className="flex flex-shrink-0 items-center gap-1.5 rounded-full border-2 border-elaw-glass-border bg-elaw-glass-highlight px-3 py-1 text-xs font-bold text-elaw-text-secondary transition-all hover:border-elaw-primary/50"
+        className="flex flex-shrink-0 items-center gap-1.5 rounded-full border-2 border-dionysus-glass-border bg-dionysus-glass-highlight px-3 py-1 text-xs font-bold text-dionysus-text-secondary transition-all hover:border-dionysus-primary/50"
         title="切换工作目录并打开文件夹"
       >
         <FolderOpen className="h-3.5 w-3.5" />
@@ -66,7 +66,7 @@ export default function QuickActionBar({
       <button
         type="button"
         onClick={onSessionsClick}
-        className="flex flex-shrink-0 items-center gap-1.5 rounded-full border-2 border-elaw-glass-border bg-elaw-glass-highlight px-3 py-1 text-xs font-bold text-elaw-text-secondary transition-all hover:border-elaw-primary/50"
+        className="flex flex-shrink-0 items-center gap-1.5 rounded-full border-2 border-dionysus-glass-border bg-dionysus-glass-highlight px-3 py-1 text-xs font-bold text-dionysus-text-secondary transition-all hover:border-dionysus-primary/50"
         title="列出 Kimi CLI 会话"
       >
         <List className="h-3.5 w-3.5" />

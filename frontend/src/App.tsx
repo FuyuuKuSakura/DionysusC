@@ -39,7 +39,7 @@ function App() {
   // Expose store for end-to-end / smoke testing only in development builds.
   if (import.meta.env.DEV) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ;(window as any).__ELAW_CHAT_STORE__ = useChatStore
+    ;(window as any).__Dionysus_CHAT_STORE__ = useChatStore
   }
 
   // Map chat session activity to the Live2D presence state.

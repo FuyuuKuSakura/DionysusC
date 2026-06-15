@@ -47,35 +47,35 @@ export function applyTheme(theme: Partial<Theme> | Theme): void {
   const dark = isDarkMode(fullTheme)
 
   const cssVars: Record<string, string> = {
-    '--elaw-primary': fullTheme.colors.primary,
-    '--elaw-primary-hover': fullTheme.colors.primaryHover,
-    '--elaw-accent': fullTheme.colors.accent,
-    '--elaw-background': fullTheme.colors.background,
-    '--elaw-chat-bg': fullTheme.colors.chatBackground,
-    '--elaw-user-bubble': fullTheme.colors.userBubble,
-    '--elaw-agent-bubble': dark
+    '--dionysus-primary': fullTheme.colors.primary,
+    '--dionysus-primary-hover': fullTheme.colors.primaryHover,
+    '--dionysus-accent': fullTheme.colors.accent,
+    '--dionysus-background': fullTheme.colors.background,
+    '--dionysus-chat-bg': fullTheme.colors.chatBackground,
+    '--dionysus-user-bubble': fullTheme.colors.userBubble,
+    '--dionysus-agent-bubble': dark
       ? fullTheme.colors.agentBubbleDark
       : fullTheme.colors.agentBubbleLight,
-    '--elaw-text-primary': dark
+    '--dionysus-text-primary': dark
       ? fullTheme.colors.textPrimaryDark
       : fullTheme.colors.textPrimaryLight,
-    '--elaw-text-secondary': fullTheme.colors.textSecondary,
-    '--elaw-system': fullTheme.colors.system,
-    '--elaw-danger': fullTheme.colors.danger,
-    '--elaw-success': fullTheme.colors.success,
-    '--elaw-code-bg': dark
+    '--dionysus-text-secondary': fullTheme.colors.textSecondary,
+    '--dionysus-system': fullTheme.colors.system,
+    '--dionysus-danger': fullTheme.colors.danger,
+    '--dionysus-success': fullTheme.colors.success,
+    '--dionysus-code-bg': dark
       ? fullTheme.colors.codeBackgroundDark
       : fullTheme.colors.codeBackgroundLight,
-    '--elaw-border': dark
+    '--dionysus-border': dark
       ? fullTheme.colors.borderDark
       : fullTheme.colors.borderLight,
-    '--elaw-panel-bg': dark ? 'rgba(20, 20, 22, 0.75)' : 'rgba(255,255,255,0.8)',
-    '--elaw-subtle-border': dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)',
-    '--elaw-status-online': fullTheme.colors.success,
-    '--elaw-status-busy': '#f59e0b',
-    '--elaw-status-offline': fullTheme.colors.danger,
-    '--elaw-font-body': fullTheme.fonts.body,
-    '--elaw-font-code': fullTheme.fonts.code,
+    '--dionysus-panel-bg': dark ? 'rgba(20, 20, 22, 0.75)' : 'rgba(255,255,255,0.8)',
+    '--dionysus-subtle-border': dark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)',
+    '--dionysus-status-online': fullTheme.colors.success,
+    '--dionysus-status-busy': '#f59e0b',
+    '--dionysus-status-offline': fullTheme.colors.danger,
+    '--dionysus-font-body': fullTheme.fonts.body,
+    '--dionysus-font-code': fullTheme.fonts.code,
   }
 
   Object.entries(cssVars).forEach(([key, value]) => {

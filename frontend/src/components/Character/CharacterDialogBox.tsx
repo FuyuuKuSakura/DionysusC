@@ -33,7 +33,7 @@ function TypingDots() {
       {[0, 1, 2].map((i) => (
         <motion.span
           key={i}
-          className="block h-1.5 w-1.5 rounded-full bg-elaw-primary"
+          className="block h-1.5 w-1.5 rounded-full bg-dionysus-primary"
           animate={{ y: [0, -4, 0] }}
           transition={{
             duration: 0.6,
@@ -72,7 +72,7 @@ export default function CharacterDialogBox() {
   return (
     <div className="relative min-w-0 px-4 pb-4">
       <div className="mb-1.5 flex items-center justify-between">
-        <div className="inline-flex items-center gap-1 rounded-full border border-elaw-glass-border bg-elaw-glass-highlight px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-elaw-primary">
+        <div className="inline-flex items-center gap-1 rounded-full border border-dionysus-glass-border bg-dionysus-glass-highlight px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-dionysus-primary">
           <span>Exusiai</span>
           {currentEmotion && (
             <span aria-label={`emotion-${currentEmotion}`}>{emotionEmoji(currentEmotion)}</span>
@@ -82,7 +82,7 @@ export default function CharacterDialogBox() {
           <button
             type="button"
             onClick={toggleExpanded}
-            className="flex items-center gap-0.5 rounded-full px-2 py-0.5 text-[10px] font-medium text-elaw-text-secondary transition-colors hover:text-elaw-primary"
+            className="flex items-center gap-0.5 rounded-full px-2 py-0.5 text-[10px] font-medium text-dionysus-text-secondary transition-colors hover:text-dionysus-primary"
             aria-label={expanded ? '收起历史' : '展开历史'}
           >
             {expanded ? (
@@ -111,12 +111,12 @@ export default function CharacterDialogBox() {
                 exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.25 }}
                 onClick={index === 0 && !expanded ? toggleExpanded : undefined}
-                className={`cel-bubble-agent relative max-w-full rounded-2xl rounded-bl-sm px-4 py-3 text-sm text-elaw-text-primary ${
+                className={`cel-bubble-agent relative max-w-full rounded-2xl rounded-bl-sm px-4 py-3 text-sm text-dionysus-text-primary ${
                   index === 0 && !expanded ? 'cursor-pointer' : ''
                 } ${index > 0 ? 'ml-3' : ''}`}
               >
                 {isTop && isTyping ? (
-                  <span className="flex items-center gap-1 text-elaw-text-secondary">
+                  <span className="flex items-center gap-1 text-dionysus-text-secondary">
                     正在思考
                     <TypingDots />
                   </span>
@@ -131,7 +131,7 @@ export default function CharacterDialogBox() {
         </AnimatePresence>
       </div>
 
-      <div className="absolute -bottom-1 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 border-b-2 border-r-2 border-elaw-glass-border bg-elaw-agent-bubble" />
+      <div className="absolute -bottom-1 left-1/2 h-3 w-3 -translate-x-1/2 rotate-45 border-b-2 border-r-2 border-dionysus-glass-border bg-dionysus-agent-bubble" />
     </div>
   )
 }

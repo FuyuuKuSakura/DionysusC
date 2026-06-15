@@ -359,8 +359,8 @@ export default function Live2DViewer({
       aria-label="Live2D 预览区域"
     >
       {loading && (
-        <div className="z-10 flex flex-col items-center gap-3 text-sm text-elaw-text-secondary">
-          <Loader2 className="h-6 w-6 animate-spin text-elaw-primary" />
+        <div className="z-10 flex flex-col items-center gap-3 text-sm text-dionysus-text-secondary">
+          <Loader2 className="h-6 w-6 animate-spin text-dionysus-primary" />
           <span>正在加载 Live2D 模型…</span>
         </div>
       )}
@@ -376,7 +376,7 @@ export default function Live2DViewer({
             className="h-80 max-h-[50vh] w-auto rounded-2xl object-cover opacity-95 shadow-lg"
           />
           {error && (
-            <div className="flex max-w-[80%] items-center gap-2 rounded-lg border border-elaw-danger/30 bg-elaw-danger/10 px-3 py-2 text-xs text-elaw-danger">
+            <div className="flex max-w-[80%] items-center gap-2 rounded-lg border border-dionysus-danger/30 bg-dionysus-danger/10 px-3 py-2 text-xs text-dionysus-danger">
               <AlertCircle className="h-4 w-4 flex-shrink-0" />
               <span className="truncate">Live2D 加载失败</span>
             </div>
@@ -384,7 +384,7 @@ export default function Live2DViewer({
           <button
             type="button"
             onClick={handleRetry}
-            className="flex items-center gap-2 rounded-full bg-elaw-primary px-4 py-2 text-sm font-medium text-white shadow-md hover:bg-elaw-primary-hover active:translate-y-px"
+            className="flex items-center gap-2 rounded-full bg-dionysus-primary px-4 py-2 text-sm font-medium text-white shadow-md hover:bg-dionysus-primary-hover active:translate-y-px"
           >
             <RefreshCw className="h-4 w-4" />
             重试加载
@@ -393,23 +393,23 @@ export default function Live2DViewer({
       )}
 
       {!loading && !error && (
-        <div className="absolute bottom-2 left-3 z-10 flex items-center gap-1.5 text-xs text-elaw-text-secondary">
+        <div className="absolute bottom-2 left-3 z-10 flex items-center gap-1.5 text-xs text-dionysus-text-secondary">
           <span
-            className={`h-2 w-2 rounded-full ${effectiveEnabled ? 'bg-elaw-success' : 'bg-elaw-system'}`}
+            className={`h-2 w-2 rounded-full ${effectiveEnabled ? 'bg-dionysus-success' : 'bg-dionysus-system'}`}
           />
           <span>{effectiveEnabled ? '鼠标跟踪中' : '跟踪已暂停'}</span>
         </div>
       )}
 
       {lookAtTarget && (
-        <div className="absolute right-3 top-2 z-10 rounded-full bg-elaw-primary/10 px-2 py-0.5 text-[10px] font-medium text-elaw-primary">
+        <div className="absolute right-3 top-2 z-10 rounded-full bg-dionysus-primary/10 px-2 py-0.5 text-[10px] font-medium text-dionysus-primary">
           look_at
         </div>
       )}
 
       {!loading && !error && (
         <div
-          className="absolute left-3 top-2 z-10 flex items-center gap-1.5 rounded-full border border-elaw-glass-border bg-elaw-panel-bg/80 px-2 py-0.5 text-[10px] font-medium text-elaw-text-secondary backdrop-blur-sm"
+          className="absolute left-3 top-2 z-10 flex items-center gap-1.5 rounded-full border border-dionysus-glass-border bg-dionysus-panel-bg/80 px-2 py-0.5 text-[10px] font-medium text-dionysus-text-secondary backdrop-blur-sm"
           title={`状态: ${presenceState}`}
         >
           <span className={`h-2 w-2 rounded-full ${PRESENCE_DOT_COLORS[presenceState]}`} />

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
-import { ELAWWebSocketClient, type ELAWWebSocketClientCallbacks } from '@/services/websocket'
+import { DionysusWebSocketClient, type DionysusWebSocketClientCallbacks } from '@/services/websocket'
 
 export interface UseWebSocketResult {
   sendMessage: (message: unknown) => boolean
@@ -7,8 +7,8 @@ export interface UseWebSocketResult {
   reconnect: () => void
 }
 
-export function useWebSocket(url: string, callbacks?: ELAWWebSocketClientCallbacks): UseWebSocketResult {
-  const clientRef = useRef<ELAWWebSocketClient | null>(null)
+export function useWebSocket(url: string, callbacks?: DionysusWebSocketClientCallbacks): UseWebSocketResult {
+  const clientRef = useRef<DionysusWebSocketClient | null>(null)
   const callbacksRef = useRef(callbacks)
   const [connected, setConnected] = useState(false)
 
@@ -17,7 +17,7 @@ export function useWebSocket(url: string, callbacks?: ELAWWebSocketClientCallbac
   }, [callbacks])
 
   useEffect(() => {
-    const client = new ELAWWebSocketClient(url, {
+    const client = new DionysusWebSocketClient(url, {
       onOpen: (event) => {
         setConnected(true)
         callbacksRef.current?.onOpen?.(event)

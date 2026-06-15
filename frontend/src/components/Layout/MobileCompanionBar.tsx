@@ -16,12 +16,12 @@ export default function MobileCompanionBar() {
       case 'reading_file':
       case 'executing':
       case 'outputting':
-        return <Loader2 className="h-3.5 w-3.5 animate-spin text-elaw-primary" />
+        return <Loader2 className="h-3.5 w-3.5 animate-spin text-dionysus-primary" />
       case 'error':
-        return <XCircle className="h-3.5 w-3.5 text-elaw-danger" />
+        return <XCircle className="h-3.5 w-3.5 text-dionysus-danger" />
       case 'idle':
       default:
-        return <Sparkles className="h-3.5 w-3.5 text-elaw-text-secondary" />
+        return <Sparkles className="h-3.5 w-3.5 text-dionysus-text-secondary" />
     }
   }
 
@@ -29,16 +29,16 @@ export default function MobileCompanionBar() {
     <button
       type="button"
       onClick={() => setCompanionDrawerOpen(true)}
-      className="flex w-full items-center justify-between gap-3 border-b border-elaw-subtle-border bg-elaw-panel-bg px-4 py-2.5 text-left md:hidden"
+      className="flex w-full items-center justify-between gap-3 border-b border-dionysus-subtle-border bg-dionysus-panel-bg px-4 py-2.5 text-left md:hidden"
       aria-label="展开角色陪伴"
     >
       <div className="flex min-w-0 items-center gap-2">
         {statusIcon()}
-        <span className="truncate text-xs text-elaw-text-secondary">
+        <span className="truncate text-xs text-dionysus-text-secondary">
           {detail}
         </span>
       </div>
-      <ChevronDown className="h-4 w-4 flex-shrink-0 text-elaw-text-secondary" />
+      <ChevronDown className="h-4 w-4 flex-shrink-0 text-dionysus-text-secondary" />
     </button>
   )
 }

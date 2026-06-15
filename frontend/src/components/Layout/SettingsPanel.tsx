@@ -222,24 +222,24 @@ export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, init
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className={`fixed inset-y-0 right-0 z-50 ${panelWidthClasses()} border-l border-elaw-subtle-border bg-elaw-panel-bg shadow-xl backdrop-blur-xl`}
+            className={`fixed inset-y-0 right-0 z-50 ${panelWidthClasses()} border-l border-dionysus-subtle-border bg-dionysus-panel-bg shadow-xl backdrop-blur-xl`}
             role="dialog"
             aria-modal="true"
             aria-label="设置面板"
           >
-            <div className="flex h-14 items-center justify-between border-b border-elaw-subtle-border px-4">
-              <h2 className="text-base font-semibold text-elaw-text-primary">设置</h2>
+            <div className="flex h-14 items-center justify-between border-b border-dionysus-subtle-border px-4">
+              <h2 className="text-base font-semibold text-dionysus-text-primary">设置</h2>
               <button
                 type="button"
                 onClick={onClose}
-                className="cel-button p-2 text-elaw-text-secondary"
+                className="cel-button p-2 text-dionysus-text-secondary"
                 aria-label="关闭设置"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <div className="flex border-b border-elaw-subtle-border">
+            <div className="flex border-b border-dionysus-subtle-border">
               {[
                 { id: 'appearance', label: '外观', icon: Palette },
                 { id: 'session', label: '会话', icon: Layers },
@@ -252,8 +252,8 @@ export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, init
                   onClick={() => setActiveTab(id as Tab)}
                   className={`flex flex-1 items-center justify-center gap-1.5 border-b-2 py-2.5 text-xs font-bold transition-all ${
                     activeTab === id
-                      ? 'border-elaw-primary text-elaw-primary'
-                      : 'border-transparent text-elaw-text-secondary hover:text-elaw-text-primary'
+                      ? 'border-dionysus-primary text-dionysus-primary'
+                      : 'border-transparent text-dionysus-text-secondary hover:text-dionysus-text-primary'
                   }`}
                 >
                   <Icon className="h-3.5 w-3.5" />
@@ -266,8 +266,8 @@ export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, init
               {activeTab === 'appearance' && (
                 <>
                   <section>
-                    <div className="mb-3 flex items-center gap-2 text-sm font-medium text-elaw-text-primary">
-                      <Palette className="h-4 w-4 text-elaw-primary" />
+                    <div className="mb-3 flex items-center gap-2 text-sm font-medium text-dionysus-text-primary">
+                      <Palette className="h-4 w-4 text-dionysus-primary" />
                       主题
                     </div>
                     <ThemeSwitcher />
@@ -275,7 +275,7 @@ export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, init
                       <button
                         type="button"
                         onClick={onOpenThemeStudio}
-                        className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl border border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2 text-xs font-bold text-elaw-text-secondary transition-colors hover:border-elaw-primary/50 hover:text-elaw-primary"
+                        className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl border border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-xs font-bold text-dionysus-text-secondary transition-colors hover:border-dionysus-primary/50 hover:text-dionysus-primary"
                       >
                         <Palette className="h-3.5 w-3.5" />
                         打开调色盘
@@ -284,7 +284,7 @@ export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, init
                   </section>
 
                   <section>
-                    <div className="mb-3 text-sm font-medium text-elaw-text-primary">风格预设</div>
+                    <div className="mb-3 text-sm font-medium text-dionysus-text-primary">风格预设</div>
                     <div className="grid grid-cols-3 gap-2">
                       {([
                         { id: 'cel', label: '赛璐珞' },
@@ -297,8 +297,8 @@ export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, init
                           onClick={() => setStylePreset(id)}
                           className={`rounded-xl border-2 px-2 py-2 text-xs font-bold transition-all ${
                             stylePreset === id
-                              ? 'border-elaw-primary bg-elaw-primary/15 text-elaw-primary'
-                              : 'border-elaw-subtle-border bg-elaw-glass-highlight text-elaw-text-secondary'
+                              ? 'border-dionysus-primary bg-dionysus-primary/15 text-dionysus-primary'
+                              : 'border-dionysus-subtle-border bg-dionysus-glass-highlight text-dionysus-text-secondary'
                           }`}
                         >
                           {label}
@@ -308,7 +308,7 @@ export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, init
                   </section>
 
                   <section>
-                    <div className="mb-3 text-sm font-medium text-elaw-text-primary">字体大小</div>
+                    <div className="mb-3 text-sm font-medium text-dionysus-text-primary">字体大小</div>
                     <div className="flex gap-2">
                       {([
                         { id: 'small', label: '小' },
@@ -321,8 +321,8 @@ export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, init
                           onClick={() => setFontSize(id)}
                           className={`flex-1 rounded-xl border-2 px-2 py-2 text-xs font-bold transition-all ${
                             fontSize === id
-                              ? 'border-elaw-primary bg-elaw-primary/15 text-elaw-primary'
-                              : 'border-elaw-subtle-border bg-elaw-glass-highlight text-elaw-text-secondary'
+                              ? 'border-dionysus-primary bg-dionysus-primary/15 text-dionysus-primary'
+                              : 'border-dionysus-subtle-border bg-dionysus-glass-highlight text-dionysus-text-secondary'
                           }`}
                         >
                           {label}
@@ -332,30 +332,30 @@ export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, init
                   </section>
 
                   <section>
-                    <div className="mb-3 text-sm font-medium text-elaw-text-primary">角色展示</div>
-                    <label className="flex cursor-pointer items-center justify-between rounded-xl border-2 border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2.5">
-                      <span className="text-sm font-medium text-elaw-text-primary">启用 Live2D</span>
+                    <div className="mb-3 text-sm font-medium text-dionysus-text-primary">角色展示</div>
+                    <label className="flex cursor-pointer items-center justify-between rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2.5">
+                      <span className="text-sm font-medium text-dionysus-text-primary">启用 Live2D</span>
                       <input
                         type="checkbox"
                         checked={live2dEnabled}
                         onChange={(e) => handleLive2dChange(e.target.checked)}
                         className="peer sr-only"
                       />
-                      <span className="relative h-6 w-11 rounded-full border-2 border-elaw-subtle-border bg-elaw-chat-bg transition-colors peer-checked:border-elaw-primary peer-checked:bg-elaw-primary after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:shadow-sm after:transition-transform peer-checked:after:translate-x-5" />
+                      <span className="relative h-6 w-11 rounded-full border-2 border-dionysus-subtle-border bg-dionysus-chat-bg transition-colors peer-checked:border-dionysus-primary peer-checked:bg-dionysus-primary after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:shadow-sm after:transition-transform peer-checked:after:translate-x-5" />
                     </label>
                   </section>
 
                   <section>
-                    <div className="mb-3 text-sm font-medium text-elaw-text-primary">界面密度</div>
-                    <label className="flex cursor-pointer items-center justify-between rounded-xl border-2 border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2.5">
-                      <span className="text-sm font-medium text-elaw-text-primary">紧凑模式</span>
+                    <div className="mb-3 text-sm font-medium text-dionysus-text-primary">界面密度</div>
+                    <label className="flex cursor-pointer items-center justify-between rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2.5">
+                      <span className="text-sm font-medium text-dionysus-text-primary">紧凑模式</span>
                       <input
                         type="checkbox"
                         checked={compactMode}
                         onChange={(e) => setCompactMode(e.target.checked)}
                         className="peer sr-only"
                       />
-                      <span className="relative h-6 w-11 rounded-full border-2 border-elaw-subtle-border bg-elaw-chat-bg transition-colors peer-checked:border-elaw-primary peer-checked:bg-elaw-primary after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:shadow-sm after:transition-transform peer-checked:after:translate-x-5" />
+                      <span className="relative h-6 w-11 rounded-full border-2 border-dionysus-subtle-border bg-dionysus-chat-bg transition-colors peer-checked:border-dionysus-primary peer-checked:bg-dionysus-primary after:absolute after:left-0.5 after:top-0.5 after:h-4 after:w-4 after:rounded-full after:bg-white after:shadow-sm after:transition-transform peer-checked:after:translate-x-5" />
                     </label>
                   </section>
                 </>
@@ -364,14 +364,14 @@ export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, init
               {activeTab === 'persona' && (
                 <>
                   <section>
-                    <div className="mb-3 flex items-center gap-2 text-sm font-medium text-elaw-text-primary">
-                      <User className="h-4 w-4 text-elaw-primary" />
+                    <div className="mb-3 flex items-center gap-2 text-sm font-medium text-dionysus-text-primary">
+                      <User className="h-4 w-4 text-dionysus-primary" />
                       当前角色
                     </div>
                     <select
                       value={selectedPersona}
                       onChange={(e) => setSelectedPersona(e.target.value)}
-                      className="w-full rounded-xl border-2 border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2 text-sm text-elaw-text-primary outline-none focus:border-elaw-primary"
+                      className="w-full rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-sm text-dionysus-text-primary outline-none focus:border-dionysus-primary"
                     >
                       {personas.map((p) => (
                         <option key={p.id} value={p.id}>
@@ -380,32 +380,32 @@ export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, init
                       ))}
                     </select>
                     {personas.find((p) => p.id === selectedPersona)?.description && (
-                      <p className="mt-2 text-xs text-elaw-text-secondary">
+                      <p className="mt-2 text-xs text-dionysus-text-secondary">
                         {personas.find((p) => p.id === selectedPersona)?.description}
                       </p>
                     )}
                   </section>
 
                   <section>
-                    <div className="mb-3 text-sm font-medium text-elaw-text-primary">提示词 / QA 数据集（YAML）</div>
+                    <div className="mb-3 text-sm font-medium text-dionysus-text-primary">提示词 / QA 数据集（YAML）</div>
                     <textarea
                       value={personaYaml}
                       onChange={(e) => setPersonaYaml(e.target.value)}
                       rows={16}
-                      className="w-full rounded-xl border-2 border-elaw-subtle-border bg-elaw-code-bg px-3 py-2 font-mono text-xs text-elaw-text-primary outline-none focus:border-elaw-primary"
+                      className="w-full rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-code-bg px-3 py-2 font-mono text-xs text-dionysus-text-primary outline-none focus:border-dionysus-primary"
                     />
                     <div className="mt-2 flex items-center gap-2">
                       <button
                         type="button"
                         onClick={savePersona}
                         disabled={personaSaving}
-                        className="flex items-center gap-1.5 whitespace-nowrap rounded-xl border-2 border-black/20 bg-elaw-primary px-3 py-1.5 text-xs font-bold text-white shadow-md transition-all hover:brightness-110 disabled:opacity-50"
+                        className="flex items-center gap-1.5 whitespace-nowrap rounded-xl border-2 border-black/20 bg-dionysus-primary px-3 py-1.5 text-xs font-bold text-white shadow-md transition-all hover:brightness-110 disabled:opacity-50"
                       >
                         <Save className="h-3.5 w-3.5" />
                         {personaSaving ? '保存中…' : '保存'}
                       </button>
                       {personaMessage && (
-                        <span className="flex items-center gap-1 text-xs text-elaw-success">
+                        <span className="flex items-center gap-1 text-xs text-dionysus-success">
                           <Check className="h-3.5 w-3.5" />
                           {personaMessage}
                         </span>
@@ -414,9 +414,9 @@ export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, init
                   </section>
 
                   <section>
-                    <div className="mb-3 text-sm font-medium text-elaw-text-primary">语料文件</div>
+                    <div className="mb-3 text-sm font-medium text-dionysus-text-primary">语料文件</div>
                     <div className="flex items-center gap-2">
-                      <label className="flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-1.5 text-xs font-bold text-elaw-text-primary transition-all hover:border-elaw-primary/50">
+                      <label className="flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-1.5 text-xs font-bold text-dionysus-text-primary transition-all hover:border-dionysus-primary/50">
                         <Upload className="h-3.5 w-3.5" />
                         选择 .txt 语料
                         <input
@@ -427,7 +427,7 @@ export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, init
                         />
                       </label>
                       {corpusFile && (
-                        <span className="max-w-[8rem] truncate text-xs text-elaw-text-secondary">
+                        <span className="max-w-[8rem] truncate text-xs text-dionysus-text-secondary">
                           {corpusFile.name}
                         </span>
                       )}
@@ -435,7 +435,7 @@ export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, init
                         type="button"
                         onClick={uploadCorpus}
                         disabled={!corpusFile}
-                        className="rounded-xl border-2 border-black/20 bg-elaw-primary px-3 py-1.5 text-xs font-bold text-white shadow-md transition-all hover:brightness-110 disabled:opacity-50"
+                        className="rounded-xl border-2 border-black/20 bg-dionysus-primary px-3 py-1.5 text-xs font-bold text-white shadow-md transition-all hover:brightness-110 disabled:opacity-50"
                       >
                         上传
                       </button>
@@ -447,14 +447,14 @@ export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, init
               {activeTab === 'agent' && (
                 <>
                   <section>
-                    <div className="mb-3 flex items-center gap-2 text-sm font-medium text-elaw-text-primary">
-                      <Bot className="h-4 w-4 text-elaw-primary" />
+                    <div className="mb-3 flex items-center gap-2 text-sm font-medium text-dionysus-text-primary">
+                      <Bot className="h-4 w-4 text-dionysus-primary" />
                       Agent 连接
                     </div>
                     <select
                       value={selectedAdapter}
                       onChange={(e) => onAdapterChange(e.target.value)}
-                      className="mb-3 w-full rounded-xl border-2 border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2 text-sm text-elaw-text-primary outline-none focus:border-elaw-primary"
+                      className="mb-3 w-full rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-sm text-dionysus-text-primary outline-none focus:border-dionysus-primary"
                     >
                       {adapterOptions.length === 0 && selectedAdapter && (
                         <option value={selectedAdapter}>{selectedAdapter}</option>
@@ -466,34 +466,34 @@ export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, init
                       ))}
                     </select>
 
-                    <label className="mb-2 block text-xs text-elaw-text-secondary">命令路径</label>
+                    <label className="mb-2 block text-xs text-dionysus-text-secondary">命令路径</label>
                     <input
                       type="text"
                       value={adapterCommand}
                       onChange={(e) => setAdapterCommand(e.target.value)}
-                      className="mb-3 w-full rounded-xl border-2 border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2 text-sm text-elaw-text-primary outline-none focus:border-elaw-primary"
+                      className="mb-3 w-full rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-sm text-dionysus-text-primary outline-none focus:border-dionysus-primary"
                       placeholder="kimi"
                     />
 
-                    <label className="mb-2 block text-xs text-elaw-text-secondary">工作目录</label>
+                    <label className="mb-2 block text-xs text-dionysus-text-secondary">工作目录</label>
                     <input
                       type="text"
                       value={adapterWorkingDir}
                       onChange={(e) => setAdapterWorkingDir(e.target.value)}
-                      className="mb-3 w-full rounded-xl border-2 border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2 text-sm text-elaw-text-primary outline-none focus:border-elaw-primary"
+                      className="mb-3 w-full rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-sm text-dionysus-text-primary outline-none focus:border-dionysus-primary"
                       placeholder="/Users/..."
                     />
 
                     {selectedSupportsModel && (
                       <>
-                        <label className="mb-2 block text-xs text-elaw-text-secondary">
+                        <label className="mb-2 block text-xs text-dionysus-text-secondary">
                           默认模型
                         </label>
                         <input
                           type="text"
                           value={adapterModel}
                           onChange={(e) => setAdapterModel(e.target.value)}
-                          className="mb-3 w-full rounded-xl border-2 border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2 text-sm text-elaw-text-primary outline-none focus:border-elaw-primary"
+                          className="mb-3 w-full rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-sm text-dionysus-text-primary outline-none focus:border-dionysus-primary"
                           placeholder="例如 claude-sonnet-4 / gpt-5.4"
                         />
                       </>
@@ -504,13 +504,13 @@ export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, init
                         type="button"
                         onClick={saveAgent}
                         disabled={agentSaving}
-                        className="flex items-center gap-1.5 whitespace-nowrap rounded-xl border-2 border-black/20 bg-elaw-primary px-3 py-1.5 text-xs font-bold text-white shadow-md transition-all hover:brightness-110 disabled:opacity-50"
+                        className="flex items-center gap-1.5 whitespace-nowrap rounded-xl border-2 border-black/20 bg-dionysus-primary px-3 py-1.5 text-xs font-bold text-white shadow-md transition-all hover:brightness-110 disabled:opacity-50"
                       >
                         <Save className="h-3.5 w-3.5" />
                         {agentSaving ? '保存中…' : '保存并重启'}
                       </button>
                       {agentMessage && (
-                        <span className="text-xs text-elaw-text-secondary">{agentMessage}</span>
+                        <span className="text-xs text-dionysus-text-secondary">{agentMessage}</span>
                       )}
                     </div>
                   </section>
@@ -525,9 +525,9 @@ export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, init
                 />
               )}
 
-              <section className="pt-4 border-t border-elaw-subtle-border">
-                <div className="rounded-xl border-2 border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2.5 text-xs text-elaw-text-secondary">
-                  ELAW v0.2.0 · Exusiai Live Agent WebUI
+              <section className="pt-4 border-t border-dionysus-subtle-border">
+                <div className="rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2.5 text-xs text-dionysus-text-secondary">
+                  Dionysus v0.2.0 · Dionysus Agent Companion
                 </div>
               </section>
             </div>
@@ -608,11 +608,11 @@ function SessionSettingsTab({ personas, adapterOptions, sendMessage }: SessionSe
   if (!session) {
     return (
       <section>
-        <div className="mb-3 flex items-center gap-2 text-sm font-medium text-elaw-text-primary">
-          <Layers className="h-4 w-4 text-elaw-primary" />
+        <div className="mb-3 flex items-center gap-2 text-sm font-medium text-dionysus-text-primary">
+          <Layers className="h-4 w-4 text-dionysus-primary" />
           当前会话
         </div>
-        <p className="rounded-xl border-2 border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2 text-xs text-elaw-text-secondary">
+        <p className="rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-xs text-dionysus-text-secondary">
           暂无选中会话，请先创建一个会话。
         </p>
       </section>
@@ -622,36 +622,36 @@ function SessionSettingsTab({ personas, adapterOptions, sendMessage }: SessionSe
   return (
     <>
       <section>
-        <div className="mb-3 flex items-center gap-2 text-sm font-medium text-elaw-text-primary">
-          <Layers className="h-4 w-4 text-elaw-primary" />
+        <div className="mb-3 flex items-center gap-2 text-sm font-medium text-dionysus-text-primary">
+          <Layers className="h-4 w-4 text-dionysus-primary" />
           当前会话
         </div>
 
-        <label className="mb-1.5 block text-xs text-elaw-text-secondary">会话标题</label>
+        <label className="mb-1.5 block text-xs text-dionysus-text-secondary">会话标题</label>
         <div className="mb-3 flex gap-2">
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="min-w-0 flex-1 rounded-xl border-2 border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2 text-sm text-elaw-text-primary outline-none focus:border-elaw-primary"
+            className="min-w-0 flex-1 rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-sm text-dionysus-text-primary outline-none focus:border-dionysus-primary"
             placeholder="输入会话名称"
           />
           <button
             type="button"
             onClick={handleRename}
             disabled={!title.trim() || title.trim() === session.title}
-            className="flex items-center gap-1.5 whitespace-nowrap rounded-xl border-2 border-black/20 bg-elaw-primary px-3 py-1.5 text-xs font-bold text-white shadow-md transition-all hover:brightness-110 disabled:opacity-50"
+            className="flex items-center gap-1.5 whitespace-nowrap rounded-xl border-2 border-black/20 bg-dionysus-primary px-3 py-1.5 text-xs font-bold text-white shadow-md transition-all hover:brightness-110 disabled:opacity-50"
           >
             <Save className="h-3.5 w-3.5" />
             重命名
           </button>
         </div>
 
-        <label className="mb-1.5 block text-xs text-elaw-text-secondary">角色</label>
+        <label className="mb-1.5 block text-xs text-dionysus-text-secondary">角色</label>
         <select
           value={selectedPersona}
           onChange={(e) => handlePersonaChange(e.target.value)}
-          className="mb-3 w-full rounded-xl border-2 border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2 text-sm text-elaw-text-primary outline-none focus:border-elaw-primary"
+          className="mb-3 w-full rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-sm text-dionysus-text-primary outline-none focus:border-dionysus-primary"
         >
           {personas.map((p) => (
             <option key={p.id} value={p.id}>
@@ -660,12 +660,12 @@ function SessionSettingsTab({ personas, adapterOptions, sendMessage }: SessionSe
           ))}
         </select>
 
-        <label className="mb-1.5 block text-xs text-elaw-text-secondary">Adapter</label>
+        <label className="mb-1.5 block text-xs text-dionysus-text-secondary">Adapter</label>
         <div className="mb-3 flex gap-2">
           <select
             value={selectedAdapter}
             onChange={(e) => setSelectedAdapter(e.target.value)}
-            className="min-w-0 flex-1 rounded-xl border-2 border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2 text-sm text-elaw-text-primary outline-none focus:border-elaw-primary"
+            className="min-w-0 flex-1 rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-sm text-dionysus-text-primary outline-none focus:border-dionysus-primary"
           >
             {adapterOptions.length === 0 && (
               <option value="">未启用 adapter</option>
@@ -680,33 +680,33 @@ function SessionSettingsTab({ personas, adapterOptions, sendMessage }: SessionSe
             type="button"
             onClick={handleSwitchAdapter}
             disabled={!selectedAdapter}
-            className="flex items-center gap-1.5 whitespace-nowrap rounded-xl border-2 border-black/20 bg-elaw-primary px-3 py-1.5 text-xs font-bold text-white shadow-md transition-all hover:brightness-110 disabled:opacity-50"
+            className="flex items-center gap-1.5 whitespace-nowrap rounded-xl border-2 border-black/20 bg-dionysus-primary px-3 py-1.5 text-xs font-bold text-white shadow-md transition-all hover:brightness-110 disabled:opacity-50"
           >
             切换
           </button>
         </div>
 
-        <label className="mb-1.5 block text-xs text-elaw-text-secondary">工作目录</label>
+        <label className="mb-1.5 block text-xs text-dionysus-text-secondary">工作目录</label>
         <div className="flex gap-2">
           <input
             type="text"
             value={workingDir}
             onChange={(e) => setWorkingDir(e.target.value)}
-            className="min-w-0 flex-1 rounded-xl border-2 border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2 text-sm text-elaw-text-primary outline-none focus:border-elaw-primary"
+            className="min-w-0 flex-1 rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-sm text-dionysus-text-primary outline-none focus:border-dionysus-primary"
             placeholder="/Users/..."
           />
           <button
             type="button"
             onClick={handleChangeWorkingDir}
             disabled={!workingDir.trim()}
-            className="flex items-center gap-1.5 whitespace-nowrap rounded-xl border-2 border-black/20 bg-elaw-primary px-3 py-1.5 text-xs font-bold text-white shadow-md transition-all hover:brightness-110 disabled:opacity-50"
+            className="flex items-center gap-1.5 whitespace-nowrap rounded-xl border-2 border-black/20 bg-dionysus-primary px-3 py-1.5 text-xs font-bold text-white shadow-md transition-all hover:brightness-110 disabled:opacity-50"
           >
             应用
           </button>
         </div>
 
         {message && (
-          <div className="mt-3 flex items-center gap-1.5 text-xs text-elaw-success">
+          <div className="mt-3 flex items-center gap-1.5 text-xs text-dionysus-success">
             <Check className="h-3.5 w-3.5" />
             {message}
           </div>

@@ -19,8 +19,8 @@ export default function DropdownOptions({ options, disabled, onSelect }: Dropdow
       onChange={handleChange}
       defaultValue=""
       className={`
-        w-full max-w-md rounded-lg border border-elaw-border bg-elaw-chat-bg px-3 py-2 text-sm text-elaw-text-primary outline-none
-        ${disabled ? 'cursor-not-allowed opacity-60' : 'focus:ring-2 focus:ring-elaw-primary'}
+        w-full max-w-md rounded-lg border border-dionysus-border bg-dionysus-chat-bg px-3 py-2 text-sm text-dionysus-text-primary outline-none
+        ${disabled ? 'cursor-not-allowed opacity-60' : 'focus:ring-2 focus:ring-dionysus-primary'}
       `}
     >
       <option value="" disabled>

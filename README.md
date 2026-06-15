@@ -1,6 +1,6 @@
-# ELAW - Exusiai Live Agent WebUI
+# Dionysus - Dionysus Agent Companion
 
-ELAW（代号“苹果派”）是一个带 **Live2D 角色陪伴** 的浏览器端 Coding Agent 交互界面。它通过 WebSocket 连接本地 FastAPI 后端，后端再调用 [Kimi Code CLI](https://kimi.com/kimicode) 等 Coding Agent。项目已从旧版 `acp-qq-bridge` 的 QQ 消息桥接，升级为**浏览器 + 局域网 WebSocket + 角色陪伴**架构。
+Dionysus（代号“苹果派”）是一个带 **Live2D 角色陪伴** 的浏览器端 Coding Agent 交互界面。它通过 WebSocket 连接本地 FastAPI 后端，后端再调用 [Kimi Code CLI](https://kimi.com/kimicode) 等 Coding Agent。项目已从旧版 `acp-qq-bridge` 的 QQ 消息桥接，升级为**浏览器 + 局域网 WebSocket + 角色陪伴**架构。
 
 > 现在你的 Agent 不仅会写代码，还会有表情、会看你鼠标、会陪你聊天。
 
@@ -54,7 +54,7 @@ ELAW（代号“苹果派”）是一个带 **Live2D 角色陪伴** 的浏览器
 ```
 .
 ├── backend/
-│   ├── elaw_server/          # FastAPI 后端
+│   ├── dionysus_server/          # FastAPI 后端
 │   │   ├── agent_adapters/   # Agent 适配器接口与 Kimi CLI 实现
 │   │   ├── session/          # 会话管理与 SQLite 持久化
 │   │   ├── websocket/        # WebSocket 连接与消息路由
@@ -127,7 +127,7 @@ agent_adapter:
 ```bash
 # 后端（监听所有网卡，方便局域网访问）
 cd backend
-.venv/bin/uvicorn elaw_server.main:app --host 0.0.0.0 --port 8765
+.venv/bin/uvicorn dionysus_server.main:app --host 0.0.0.0 --port 8765
 
 # 前端（开发模式，同时监听所有网卡）
 cd frontend

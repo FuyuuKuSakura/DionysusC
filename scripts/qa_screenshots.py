@@ -30,7 +30,7 @@ async def capture():
         await page.goto('http://127.0.0.1:5173/')
         await page.wait_for_timeout(2000)
         await page.evaluate(f'''async () => {{
-            const store = window.__ELAW_CHAT_STORE__?.getState?.();
+            const store = window.__Dionysus_CHAT_STORE__?.getState?.();
             if (store) {{
                 store.setTodos({js_obj(TODOS)});
                 store.setStreaming(true);

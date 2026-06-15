@@ -1,11 +1,11 @@
-export interface ELAWWebSocketClientCallbacks {
+export interface DionysusWebSocketClientCallbacks {
   onMessage?: (data: unknown) => void
   onOpen?: (event: Event) => void
   onClose?: (event: CloseEvent) => void
   onError?: (event: Event) => void
 }
 
-export class ELAWWebSocketClient {
+export class DionysusWebSocketClient {
   private url: string
   private ws: WebSocket | null = null
   private reconnectAttempts = 0
@@ -21,7 +21,7 @@ export class ELAWWebSocketClient {
   public onClose?: (event: CloseEvent) => void
   public onError?: (event: Event) => void
 
-  constructor(url: string, callbacks?: ELAWWebSocketClientCallbacks) {
+  constructor(url: string, callbacks?: DionysusWebSocketClientCallbacks) {
     this.url = url
     if (callbacks) {
       this.onMessage = callbacks.onMessage

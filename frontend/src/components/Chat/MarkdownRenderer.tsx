@@ -35,11 +35,11 @@ function CodeBlock({ children }: { children: React.ReactNode }) {
       <button
         type="button"
         onClick={handleCopy}
-        className="absolute right-2 top-2 rounded-md bg-elaw-text-secondary/20 p-1.5 text-elaw-text-secondary hover:bg-elaw-text-secondary/30"
+        className="absolute right-2 top-2 rounded-md bg-dionysus-text-secondary/20 p-1.5 text-dionysus-text-secondary hover:bg-dionysus-text-secondary/30"
         aria-label="复制代码"
       >
         {copied ? (
-          <Check className="h-4 w-4 text-elaw-success" />
+          <Check className="h-4 w-4 text-dionysus-success" />
         ) : (
           <Copy className="h-4 w-4" />
         )}

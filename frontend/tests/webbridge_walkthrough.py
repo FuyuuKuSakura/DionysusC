@@ -3,7 +3,7 @@ import time
 import urllib.request
 
 BASE = 'http://127.0.0.1:10086/command'
-SESSION = 'elaw-test'
+SESSION = 'dionysus-test'
 OUT_DIR = '/Users/fuyuuku/ACP_AGENT2'
 
 
@@ -35,7 +35,7 @@ def main():
         print('close_session ignored', e)
 
     print('navigate')
-    nav = send('navigate', {'url': 'http://127.0.0.1:5173/', 'newTab': True, 'group_title': 'ELAW Test'})
+    nav = send('navigate', {'url': 'http://127.0.0.1:5173/', 'newTab': True, 'group_title': 'Dionysus Test'})
     print(nav)
     time.sleep(2)
     # Clear any persisted legacy theme so the new default cel theme loads.
@@ -92,7 +92,7 @@ def main():
     # Simulate agent stream with tool call and options via evaluate
     simulate_script = """
         (() => {
-            const store = window.__ELAW_CHAT_STORE__;
+            const store = window.__Dionysus_CHAT_STORE__;
             if (!store) return 'no store';
             store.getState().setStreaming(true);
             store.getState().setStreamingStatus({ status: 'thinking', detail: '正在思考' });

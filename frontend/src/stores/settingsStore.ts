@@ -32,7 +32,7 @@ export const useSettingsStore = create<SettingsState>()(
       setCompactMode: (value) => set({ compactMode: value }),
     }),
     {
-      name: 'elaw-settings',
+      name: 'dionysus-settings',
     },
   ),
 )

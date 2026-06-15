@@ -28,7 +28,7 @@ async def wait_for_streaming_stop(page, timeout: float = 60.0):
     start = asyncio.get_event_loop().time()
     while True:
         streaming = await page.evaluate(
-            "() => { const s = window.__ELAW_CHAT_STORE__; return s ? s.getState().isStreaming : false; }"
+            "() => { const s = window.__Dionysus_CHAT_STORE__; return s ? s.getState().isStreaming : false; }"
         )
         if not streaming:
             return True

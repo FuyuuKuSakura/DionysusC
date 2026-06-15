@@ -36,12 +36,12 @@ export default function StreamingStatusBox({
   if (!hasContent) {
     return (
       <div className="flex justify-start">
-        <div className="cel-bubble-agent flex max-w-4/5 items-center gap-3 rounded-2xl rounded-tl-sm px-4 py-3 text-elaw-text-primary">
-          <Loader2 className="h-5 w-5 animate-spin text-elaw-primary" />
+        <div className="cel-bubble-agent flex max-w-4/5 items-center gap-3 rounded-2xl rounded-tl-sm px-4 py-3 text-dionysus-text-primary">
+          <Loader2 className="h-5 w-5 animate-spin text-dionysus-primary" />
           <div className="flex flex-col">
             <span className="text-sm">{statusText}</span>
             {elapsed > 5 && (
-              <span className="text-xs text-elaw-text-secondary">
+              <span className="text-xs text-dionysus-text-secondary">
                 已用时 {formatElapsed(elapsed)}
               </span>
             )}
@@ -53,12 +53,12 @@ export default function StreamingStatusBox({
 
   return (
     <div className="flex justify-start">
-      <div className="cel-bubble-agent max-w-4/5 rounded-2xl rounded-tl-sm px-4 py-2.5 text-elaw-text-primary">
-        <div className="mb-2 flex items-center gap-2 border-b-2 border-elaw-border pb-1.5">
-          <Loader2 className="h-4 w-4 animate-spin text-elaw-primary" />
-          <span className="text-xs font-medium text-elaw-text-secondary">{statusText}</span>
+      <div className="cel-bubble-agent max-w-4/5 rounded-2xl rounded-tl-sm px-4 py-2.5 text-dionysus-text-primary">
+        <div className="mb-2 flex items-center gap-2 border-b-2 border-dionysus-border pb-1.5">
+          <Loader2 className="h-4 w-4 animate-spin text-dionysus-primary" />
+          <span className="text-xs font-medium text-dionysus-text-secondary">{statusText}</span>
           {elapsed > 5 && (
-            <span className="ml-auto text-xs text-elaw-text-secondary">
+            <span className="ml-auto text-xs text-dionysus-text-secondary">
               {formatElapsed(elapsed)}
             </span>
           )}

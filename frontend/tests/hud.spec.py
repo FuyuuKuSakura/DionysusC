@@ -16,7 +16,7 @@ async def main():
 
         # Simulate incoming agent stream with tool-call metadata.
         await page.evaluate("""
-            const store = window.__ELAW_CHAT_STORE__;
+            const store = window.__Dionysus_CHAT_STORE__;
             store.getState().setStreaming(true);
             store.getState().setStreamingStatus({ status: 'thinking', detail: '正在思考' });
             store.getState().addAgentChunk('好的，我来帮你创建文件。\\n');

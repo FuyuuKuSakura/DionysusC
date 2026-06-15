@@ -34,7 +34,7 @@ export default function Layout({ sendMessage, connected = false }: LayoutProps) 
   }, [setAvailableThemes])
 
   return (
-    <div className="flex h-full w-full overflow-hidden bg-elaw-background">
+    <div className="flex h-full w-full overflow-hidden bg-dionysus-background">
       {/* Desktop / tablet: leftmost navigation */}
       <div className="hidden md:flex">
         <NavSidebar

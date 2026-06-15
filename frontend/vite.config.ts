@@ -13,8 +13,8 @@ export default defineConfig({
           VitePWA({
             registerType: 'autoUpdate',
             manifest: {
-              name: 'ELAW - Exusiai Agent',
-              short_name: 'ELAW',
+              name: 'Dionysus - Exusiai Agent',
+              short_name: 'Dionysus',
               start_url: '/',
               display: 'standalone',
               background_color: '#ffffff',

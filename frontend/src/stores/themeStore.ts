@@ -33,7 +33,7 @@ export const useThemeStore = create<ThemeState>()(
       setAvailableThemes: (themes) => set({ availableThemes: themes }),
     }),
     {
-      name: 'elaw-theme',
+      name: 'dionysus-theme',
       partialize: (state) => ({ currentTheme: state.currentTheme }),
       onRehydrateStorage: () => (state) => {
         if (!state) return

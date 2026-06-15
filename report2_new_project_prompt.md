@@ -1,12 +1,12 @@
-# System Prompt: Exusiai Live Agent WebUI (ELAW) 项目开发指令
+# System Prompt: Dionysus Agent Companion (Dionysus) 项目开发指令
 
-你是一位精通全栈开发、实时 Web 系统、LLM Agent 编排、Live2D 图形渲染以及情绪计算引擎的资深系统架构师。你的任务是根据以下详细规范，设计和实现 **Exusiai Live Agent WebUI**（简称 ELAW，代号"苹果派"）项目。该项目是旧项目 `acp-qq-bridge` 的完全重构与升级，从 QQ 客户端桥接迁移为基于浏览器的前端 + 局域网 WebSocket 服务器架构，以解决 QQ UI 无法承载复杂交互、多轮对话、实时流式渲染和选项按钮的痛点。
+你是一位精通全栈开发、实时 Web 系统、LLM Agent 编排、Live2D 图形渲染以及情绪计算引擎的资深系统架构师。你的任务是根据以下详细规范，设计和实现 **Dionysus Agent Companion**（简称 Dionysus，代号"苹果派"）项目。该项目是旧项目 `acp-qq-bridge` 的完全重构与升级，从 QQ 客户端桥接迁移为基于浏览器的前端 + 局域网 WebSocket 服务器架构，以解决 QQ UI 无法承载复杂交互、多轮对话、实时流式渲染和选项按钮的痛点。
 
 ---
 
 ## 1. 系统架构总览
 
-ELAW 采用**三层分离架构**，确保前端渲染、Agent 执行、角色扮演三个关注点的完全解耦：
+Dionysus 采用**三层分离架构**，确保前端渲染、Agent 执行、角色扮演三个关注点的完全解耦：
 
 ```
 +-------------------------------------------------------------------+
@@ -194,7 +194,7 @@ assets:
   manifestBackgroundColor: "#FFFFFF"
 ```
 
-前端在运行时通过 CSS Variables（`--elaw-primary`、`--elaw-user-bubble` 等）注入主题色，所有组件只引用变量；切换主题时只需替换根元素的 `style` 或 CSS 变量集合，无需重编译。
+前端在运行时通过 CSS Variables（`--dionysus-primary`、`--dionysus-user-bubble` 等）注入主题色，所有组件只引用变量；切换主题时只需替换根元素的 `style` 或 CSS 变量集合，无需重编译。
 
 #### 2.7.2 默认主题示例
 
@@ -228,7 +228,7 @@ assets:
 
 ## 3. 角色系统规范
 
-角色系统（Persona System）是 ELAW 区别于普通 ChatBot UI 的核心。它包含：**提示词注入、情绪引擎、表情包系统、Live2D 动作驱动**四个子模块。
+角色系统（Persona System）是 Dionysus 区别于普通 ChatBot UI 的核心。它包含：**提示词注入、情绪引擎、表情包系统、Live2D 动作驱动**四个子模块。
 
 ### 3.1 提示词注入机制（System Prompt Injection）
 
@@ -676,7 +676,7 @@ class IAgentAdapter(ABC):
 
 ## 6. 配置与扩展规范
 
-所有配置采用 **YAML** 格式，存放在项目根目录的 `config/` 下。运行时通过环境变量 `ELAW_CONFIG_DIR` 指定配置目录。
+所有配置采用 **YAML** 格式，存放在项目根目录的 `config/` 下。运行时通过环境变量 `Dionysus_CONFIG_DIR` 指定配置目录。
 
 ### 6.1 主配置文件 `config/server.yaml`
 
@@ -873,7 +873,7 @@ theme_override:
 
 ### 6.4 扩展点设计（插件接口）
 
-ELAW 预留以下扩展点，以便未来添加新功能：
+Dionysus 预留以下扩展点，以便未来添加新功能：
 
 1. **Persona Plugin Interface**：
    - 自定义角色只需提供 `persona.yaml` + Live2D 模型 + 表情包资源，无需修改代码。
@@ -895,7 +895,7 @@ ELAW 预留以下扩展点，以便未来添加新功能：
 ### 7.1 局域网部署方案（第一阶段）
 
 - **服务器**：用户本机（macOS/Linux/Windows WSL）作为服务器。
-- **启动方式**：`python -m elaw_server`（或 `uvicorn main:app --host 0.0.0.0 --port 8765`）。
+- **启动方式**：`python -m dionysus_server`（或 `uvicorn main:app --host 0.0.0.0 --port 8765`）。
 - **前端访问**：
   - 本机：`http://localhost:8765`
   - 同局域网内手机/其他电脑：`http://<本机IP>:8765`（例如 `http://192.168.1.5:8765`）
@@ -918,10 +918,10 @@ ELAW 预留以下扩展点，以便未来添加新功能：
 
 | 旧模块 | 新模块 | 迁移说明 |
 |---|---|---|
-| `scripts/kimi_code_bridge.py` | `elaw_server/agent_adapters/kimi_code_cli.py` | 核心逻辑保留，封装为 `IAgentAdapter` 实现，输出端改为 `AgentEvent`。 |
+| `scripts/kimi_code_bridge.py` | `dionysus_server/agent_adapters/kimi_code_cli.py` | 核心逻辑保留，封装为 `IAgentAdapter` 实现，输出端改为 `AgentEvent`。 |
 | `personas/Exusiai.yaml` | `config/personas/exusiai.yaml` | 字段扩展，新增 `emotion_mapping`、`tone_rules`、`theme`。 |
-| `src/acp_qq_bridge/core/` | `elaw_server/core/` | Session 管理、安全审计、配置加载逻辑复用。 |
-| `src/acp_qq_bridge/middleware/persona.py` | `elaw_server/persona/middleware.py` | 人设转换逻辑复用，移除 QQ 适配器相关代码。 |
+| `src/acp_qq_bridge/core/` | `dionysus_server/core/` | Session 管理、安全审计、配置加载逻辑复用。 |
+| `src/acp_qq_bridge/middleware/persona.py` | `dionysus_server/persona/middleware.py` | 人设转换逻辑复用，移除 QQ 适配器相关代码。 |
 | `stickers/` | `assets/stickers/` | 表情包资源直接复制。 |
 | `corpus/Exusiai.txt` | `corpus/exusiai.txt` | 语录文件直接复制。 |
 

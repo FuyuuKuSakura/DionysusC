@@ -262,20 +262,20 @@ export default function ThemeStudio({ isOpen, onClose }: ThemeStudioProps) {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className={`fixed inset-y-0 right-0 z-50 ${panelWidthClasses()} border-l border-elaw-subtle-border bg-elaw-panel-bg shadow-xl backdrop-blur-xl`}
+            className={`fixed inset-y-0 right-0 z-50 ${panelWidthClasses()} border-l border-dionysus-subtle-border bg-dionysus-panel-bg shadow-xl backdrop-blur-xl`}
             role="dialog"
             aria-modal="true"
             aria-label="调色盘"
           >
-            <div className="flex h-14 items-center justify-between border-b border-elaw-subtle-border px-4">
-              <h2 className="flex items-center gap-2 text-base font-semibold text-elaw-text-primary">
-                <Palette className="h-4 w-4 text-elaw-primary" />
+            <div className="flex h-14 items-center justify-between border-b border-dionysus-subtle-border px-4">
+              <h2 className="flex items-center gap-2 text-base font-semibold text-dionysus-text-primary">
+                <Palette className="h-4 w-4 text-dionysus-primary" />
                 调色盘
               </h2>
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-full p-2 text-elaw-text-secondary transition-colors hover:bg-elaw-glass-highlight"
+                className="rounded-full p-2 text-dionysus-text-secondary transition-colors hover:bg-dionysus-glass-highlight"
                 aria-label="关闭"
               >
                 <X className="h-5 w-5" />
@@ -284,10 +284,10 @@ export default function ThemeStudio({ isOpen, onClose }: ThemeStudioProps) {
 
             <div className="flex h-[calc(100%-3.5rem)] flex-col">
               {/* Preview */}
-              <div className="flex-shrink-0 border-b border-elaw-subtle-border p-4">
-                <div className="mb-2 text-xs font-bold text-elaw-text-secondary">实时预览</div>
+              <div className="flex-shrink-0 border-b border-dionysus-subtle-border p-4">
+                <div className="mb-2 text-xs font-bold text-dionysus-text-secondary">实时预览</div>
                 <div
-                  className="rounded-xl border border-elaw-subtle-border p-3"
+                  className="rounded-xl border border-dionysus-subtle-border p-3"
                   style={{ background: colors.chatBackground }}
                 >
                   <div className="mb-2 max-w-[80%] rounded-2xl rounded-tl-sm px-3 py-2 text-sm" style={{ background: colors.userBubble, color: '#fff' }}>
@@ -315,7 +315,7 @@ export default function ThemeStudio({ isOpen, onClose }: ThemeStudioProps) {
                       key={p.label}
                       type="button"
                       onClick={() => handlePreset(p.theme)}
-                      className="rounded-full border border-elaw-subtle-border bg-elaw-glass-highlight px-2.5 py-1 text-xs font-bold text-elaw-text-secondary transition-colors hover:border-elaw-primary/50"
+                      className="rounded-full border border-dionysus-subtle-border bg-dionysus-glass-highlight px-2.5 py-1 text-xs font-bold text-dionysus-text-secondary transition-colors hover:border-dionysus-primary/50"
                     >
                       <Copy className="mr-1 inline h-3 w-3" />
                       {p.label}
@@ -326,8 +326,8 @@ export default function ThemeStudio({ isOpen, onClose }: ThemeStudioProps) {
                     onClick={() => setShowYaml((v) => !v)}
                     className={`ml-auto flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-bold transition-colors ${
                       showYaml
-                        ? 'border-elaw-primary bg-elaw-primary/15 text-elaw-primary'
-                        : 'border-elaw-subtle-border bg-elaw-glass-highlight text-elaw-text-secondary'
+                        ? 'border-dionysus-primary bg-dionysus-primary/15 text-dionysus-primary'
+                        : 'border-dionysus-subtle-border bg-dionysus-glass-highlight text-dionysus-text-secondary'
                     }`}
                   >
                     <FileCode className="h-3 w-3" />
@@ -341,18 +341,18 @@ export default function ThemeStudio({ isOpen, onClose }: ThemeStudioProps) {
                       value={yamlText}
                       onChange={(e) => handleYamlChange(e.target.value)}
                       rows={24}
-                      className="w-full rounded-xl border border-elaw-subtle-border bg-elaw-glass-highlight p-3 font-mono text-xs text-elaw-text-primary outline-none focus:border-elaw-primary"
+                      className="w-full rounded-xl border border-dionysus-subtle-border bg-dionysus-glass-highlight p-3 font-mono text-xs text-dionysus-text-primary outline-none focus:border-dionysus-primary"
                     />
                     <div className="flex gap-2">
                       <button
                         type="button"
                         onClick={exportYaml}
-                        className="flex items-center gap-1 rounded-full bg-elaw-glass-highlight px-3 py-1.5 text-xs font-bold text-elaw-text-secondary transition-colors hover:bg-elaw-primary/10"
+                        className="flex items-center gap-1 rounded-full bg-dionysus-glass-highlight px-3 py-1.5 text-xs font-bold text-dionysus-text-secondary transition-colors hover:bg-dionysus-primary/10"
                       >
                         <Download className="h-3.5 w-3.5" />
                         导出
                       </button>
-                      <label className="flex cursor-pointer items-center gap-1 rounded-full bg-elaw-glass-highlight px-3 py-1.5 text-xs font-bold text-elaw-text-secondary transition-colors hover:bg-elaw-primary/10">
+                      <label className="flex cursor-pointer items-center gap-1 rounded-full bg-dionysus-glass-highlight px-3 py-1.5 text-xs font-bold text-dionysus-text-secondary transition-colors hover:bg-dionysus-primary/10">
                         <Upload className="h-3.5 w-3.5" />
                         导入
                         <input
@@ -368,27 +368,27 @@ export default function ThemeStudio({ isOpen, onClose }: ThemeStudioProps) {
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="mb-1 block text-xs text-elaw-text-secondary">主题 ID</label>
+                        <label className="mb-1 block text-xs text-dionysus-text-secondary">主题 ID</label>
                         <input
                           type="text"
                           value={themeId}
                           onChange={(e) => setThemeId(e.target.value)}
-                          className="w-full rounded-xl border border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2 text-sm text-elaw-text-primary outline-none focus:border-elaw-primary"
+                          className="w-full rounded-xl border border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-sm text-dionysus-text-primary outline-none focus:border-dionysus-primary"
                         />
                       </div>
                       <div>
-                        <label className="mb-1 block text-xs text-elaw-text-secondary">主题名称</label>
+                        <label className="mb-1 block text-xs text-dionysus-text-secondary">主题名称</label>
                         <input
                           type="text"
                           value={themeName}
                           onChange={(e) => setThemeName(e.target.value)}
-                          className="w-full rounded-xl border border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2 text-sm text-elaw-text-primary outline-none focus:border-elaw-primary"
+                          className="w-full rounded-xl border border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-sm text-dionysus-text-primary outline-none focus:border-dionysus-primary"
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="mb-1 block text-xs text-elaw-text-secondary">模式</label>
+                      <label className="mb-1 block text-xs text-dionysus-text-secondary">模式</label>
                       <div className="flex gap-2">
                         {(['light', 'dark', 'auto'] as const).map((m) => (
                           <button
@@ -397,8 +397,8 @@ export default function ThemeStudio({ isOpen, onClose }: ThemeStudioProps) {
                             onClick={() => setMode(m)}
                             className={`flex-1 rounded-xl border px-3 py-2 text-xs font-bold transition-all ${
                               mode === m
-                                ? 'border-elaw-primary bg-elaw-primary/15 text-elaw-primary'
-                                : 'border-elaw-subtle-border bg-elaw-glass-highlight text-elaw-text-secondary'
+                                ? 'border-dionysus-primary bg-dionysus-primary/15 text-dionysus-primary'
+                                : 'border-dionysus-subtle-border bg-dionysus-glass-highlight text-dionysus-text-secondary'
                             }`}
                           >
                             {m === 'light' ? '浅色' : m === 'dark' ? '深色' : '自动'}
@@ -409,21 +409,21 @@ export default function ThemeStudio({ isOpen, onClose }: ThemeStudioProps) {
 
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <label className="mb-1 block text-xs text-elaw-text-secondary">正文字体</label>
+                        <label className="mb-1 block text-xs text-dionysus-text-secondary">正文字体</label>
                         <input
                           type="text"
                           value={bodyFont}
                           onChange={(e) => setBodyFont(e.target.value)}
-                          className="w-full rounded-xl border border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2 text-sm text-elaw-text-primary outline-none focus:border-elaw-primary"
+                          className="w-full rounded-xl border border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-sm text-dionysus-text-primary outline-none focus:border-dionysus-primary"
                         />
                       </div>
                       <div>
-                        <label className="mb-1 block text-xs text-elaw-text-secondary">代码字体</label>
+                        <label className="mb-1 block text-xs text-dionysus-text-secondary">代码字体</label>
                         <input
                           type="text"
                           value={codeFont}
                           onChange={(e) => setCodeFont(e.target.value)}
-                          className="w-full rounded-xl border border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2 text-sm text-elaw-text-primary outline-none focus:border-elaw-primary"
+                          className="w-full rounded-xl border border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-sm text-dionysus-text-primary outline-none focus:border-dionysus-primary"
                         />
                       </div>
                     </div>
@@ -438,12 +438,12 @@ export default function ThemeStudio({ isOpen, onClose }: ThemeStudioProps) {
                             className="h-9 w-9 flex-shrink-0 cursor-pointer rounded-lg border-0 bg-transparent p-0"
                           />
                           <div className="min-w-0 flex-1">
-                            <label className="block text-xs text-elaw-text-secondary">{label}</label>
+                            <label className="block text-xs text-dionysus-text-secondary">{label}</label>
                             <input
                               type="text"
                               value={colors[key]}
                               onChange={(e) => handleColorChange(key, e.target.value)}
-                              className="w-full rounded-lg border border-elaw-subtle-border bg-elaw-glass-highlight px-2 py-1 text-xs text-elaw-text-primary outline-none focus:border-elaw-primary"
+                              className="w-full rounded-lg border border-dionysus-subtle-border bg-dionysus-glass-highlight px-2 py-1 text-xs text-dionysus-text-primary outline-none focus:border-dionysus-primary"
                             />
                           </div>
                         </div>
@@ -454,12 +454,12 @@ export default function ThemeStudio({ isOpen, onClose }: ThemeStudioProps) {
               </div>
 
               {/* Footer */}
-              <div className="flex-shrink-0 border-t border-elaw-subtle-border p-4">
+              <div className="flex-shrink-0 border-t border-dionysus-subtle-border p-4">
                 <div className="mb-3 flex items-center gap-2">
                   <button
                     type="button"
                     onClick={saveTheme}
-                    className="flex items-center gap-1.5 rounded-xl bg-elaw-primary px-3 py-2 text-xs font-bold text-white shadow-md transition-all hover:brightness-110"
+                    className="flex items-center gap-1.5 rounded-xl bg-dionysus-primary px-3 py-2 text-xs font-bold text-white shadow-md transition-all hover:brightness-110"
                   >
                     <Save className="h-3.5 w-3.5" />
                     保存为主题
@@ -467,16 +467,16 @@ export default function ThemeStudio({ isOpen, onClose }: ThemeStudioProps) {
                   <button
                     type="button"
                     onClick={deleteTheme}
-                    className="flex items-center gap-1.5 rounded-xl bg-elaw-glass-highlight px-3 py-2 text-xs font-bold text-elaw-danger transition-colors hover:bg-elaw-danger/10"
+                    className="flex items-center gap-1.5 rounded-xl bg-dionysus-glass-highlight px-3 py-2 text-xs font-bold text-dionysus-danger transition-colors hover:bg-dionysus-danger/10"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                     删除
                   </button>
                   {message && (
-                    <span className="text-xs text-elaw-text-secondary">{message}</span>
+                    <span className="text-xs text-dionysus-text-secondary">{message}</span>
                   )}
                 </div>
-                <div className="rounded-xl border border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2 text-xs text-elaw-text-secondary">
+                <div className="rounded-xl border border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-xs text-dionysus-text-secondary">
                   提示：保存后会立即应用并写入后端主题目录。
                 </div>
               </div>
