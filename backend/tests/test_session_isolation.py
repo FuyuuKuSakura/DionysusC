@@ -65,6 +65,7 @@ async def main():
         async with websockets.connect(WS_URL) as ws_b:
             session_b = await new_session(ws_b)
             await send_command(ws_b, session_b, "change_working_dir", tmp_b)
+            await send_command(ws_b, session_b, "switch_adapter", "kimi_cli")
 
     row_a = db_session(session_a)
     row_b = db_session(session_b)
@@ -77,7 +78,9 @@ async def main():
     assert row_a.get("working_dir") == resolved_a, f"A working_dir mismatch: {row_a}"
     assert row_b.get("working_dir") == resolved_b, f"B working_dir mismatch: {row_b}"
     assert row_a.get("id") != row_b.get("id"), "sessions must be different"
-    print("PASS: per-session workspace isolation verified")
+    assert row_a.get("adapter_id") is None, f"A adapter should stay default: {row_a}"
+    assert row_b.get("adapter_id") == "kimi_cli", f"B adapter should be persisted: {row_b}"
+    print("PASS: per-session workspace and adapter isolation verified")
 
 
 if __name__ == "__main__":
