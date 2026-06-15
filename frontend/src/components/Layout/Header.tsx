@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Menu, Settings, Download, PanelLeft, PanelLeftClose, Check, Sparkles, Bot } from 'lucide-react'
+import { ArrowLeft, Settings, Download, Check, Sparkles, Bot, LayoutGrid } from 'lucide-react'
 import { useChatStore } from '@/stores/chatStore'
 import { useAdapterStore } from '@/stores/adapterStore'
+import { useLayoutStore } from '@/stores/layoutStore'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<{ outcome: 'accepted' | 'dismissed' }>
@@ -9,26 +10,17 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 interface HeaderProps {
-  onMenuClick: () => void
-  onToggleSidebar: () => void
   onSettingsClick: () => void
-  onCompanionClick?: () => void
-  sidebarCollapsed?: boolean
+  showBack?: boolean
   connected?: boolean
 }
 
-export default function Header({
-  onMenuClick,
-  onToggleSidebar,
-  onSettingsClick,
-  onCompanionClick,
-  sidebarCollapsed = false,
-  connected = false,
-}: HeaderProps) {
+export default function Header({ onSettingsClick, showBack = false, connected = false }: HeaderProps) {
   const currentSession = useChatStore((state) =>
     state.sessions.find((s) => s.id === state.currentSessionId),
   )
   const { currentAdapter, availableAdapters, fetchAdapters } = useAdapterStore()
+  const { toggleCompanionDrawer, toggleResourcePanel, setMobileView } = useLayoutStore()
 
   useEffect(() => {
     fetchAdapters()
@@ -72,34 +64,21 @@ export default function Header({
 
   return (
     <header className="flex h-14 flex-shrink-0 items-center justify-between border-b border-elaw-glass-border bg-elaw-glass-bg px-4 dark:backdrop-blur-xl">
-      <div className="flex items-center gap-1 lg:gap-3">
-        <button
-          type="button"
-          onClick={onMenuClick}
-          className="cel-button p-2 text-elaw-text-secondary lg:hidden"
-          aria-label="打开侧边栏"
-        >
-          <Menu className="h-5 w-5" />
-        </button>
-
-        <button
-          type="button"
-          onClick={onToggleSidebar}
-          className="cel-button hidden p-2 text-elaw-text-secondary lg:flex"
-          aria-label={sidebarCollapsed ? '展开侧边栏' : '收起侧边栏'}
-          title={sidebarCollapsed ? '展开侧边栏' : '收起侧边栏'}
-        >
-          {sidebarCollapsed ? (
-            <PanelLeft className="h-5 w-5" />
-          ) : (
-            <PanelLeftClose className="h-5 w-5" />
-          )}
-        </button>
+      <div className="flex items-center gap-2">
+        {showBack && (
+          <button
+            type="button"
+            onClick={() => setMobileView('session-list')}
+            className="cel-button p-2 text-elaw-text-secondary"
+            aria-label="返回会话列表"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+        )}
+        <h1 className="truncate px-2 text-base font-semibold text-elaw-text-primary sm:text-lg">
+          {currentSession?.title ?? 'ELAW'}
+        </h1>
       </div>
-
-      <h1 className="truncate px-2 text-base font-semibold text-elaw-text-primary sm:text-lg">
-        {currentSession?.title ?? 'ELAW'}
-      </h1>
 
       <div className="flex items-center gap-1 sm:gap-2">
         {currentAdapter && (
@@ -131,12 +110,21 @@ export default function Header({
         </button>
         <button
           type="button"
-          onClick={onCompanionClick}
-          className="cel-button p-2 text-elaw-text-secondary lg:hidden"
+          onClick={toggleCompanionDrawer}
+          className="cel-button p-2 text-elaw-text-secondary md:hidden"
           aria-label="角色陪伴"
           title="角色陪伴"
         >
           <Sparkles className="h-5 w-5" />
+        </button>
+        <button
+          type="button"
+          onClick={toggleResourcePanel}
+          className="cel-button p-2 text-elaw-text-secondary md:hidden"
+          aria-label="资源面板"
+          title="资源面板"
+        >
+          <LayoutGrid className="h-5 w-5" />
         </button>
         <button
           type="button"
