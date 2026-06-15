@@ -7,7 +7,7 @@ export default function QRCodeButton() {
   const [url, setUrl] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const buttonRef = useRef<HTMLButtonElement>(null)
-  const [pos, setPos] = useState<{ top: number; left: number } | null>(null)
+  const [pos, setPos] = useState<{ bottom: number; left: number } | null>(null)
 
   useEffect(() => {
     if (!open) return
@@ -25,8 +25,8 @@ export default function QRCodeButton() {
     const updatePos = () => {
       const rect = buttonRef.current!.getBoundingClientRect()
       setPos({
-        top: rect.top + window.scrollY,
-        left: rect.right + window.scrollX + 8,
+        bottom: window.innerHeight - rect.bottom,
+        left: rect.right + 8,
       })
     }
     updatePos()
@@ -41,7 +41,7 @@ export default function QRCodeButton() {
   const popup = (
     <div
       className="fixed z-[200] w-64 rounded-2xl border border-dionysus-glass-border bg-dionysus-glass-bg p-4 shadow-xl backdrop-blur-xl"
-      style={pos ? { top: pos.top, left: pos.left } : {}}
+      style={pos ? { bottom: pos.bottom, left: pos.left } : {}}
     >
       <div className="mb-2 flex items-center justify-between">
         <span className="text-sm font-semibold text-dionysus-text-primary">扫码连接</span>
