@@ -14,8 +14,31 @@ const NAV_ITEMS: NavItemDef[] = [
   { id: 'settings', label: '设置', icon: Settings },
 ]
 
-export default function NavSidebar() {
+interface NavSidebarProps {
+  onOpenSettings?: (tab: 'appearance' | 'persona' | 'agent') => void
+  onOpenThemeStudio?: () => void
+}
+
+export default function NavSidebar({ onOpenSettings, onOpenThemeStudio }: NavSidebarProps) {
   const { activeNav, setActiveNav } = useLayoutStore()
+
+  const handleClick = (id: NavItem) => {
+    setActiveNav(id)
+    switch (id) {
+      case 'sessions':
+        // Default page, nothing extra to open
+        break
+      case 'themes':
+        onOpenThemeStudio?.()
+        break
+      case 'character':
+        onOpenSettings?.('persona')
+        break
+      case 'settings':
+        onOpenSettings?.('appearance')
+        break
+    }
+  }
 
   return (
     <nav
@@ -34,7 +57,7 @@ export default function NavSidebar() {
             <button
               key={item.id}
               type="button"
-              onClick={() => setActiveNav(item.id)}
+              onClick={() => handleClick(item.id)}
               title={item.label}
               aria-label={item.label}
               className={`
