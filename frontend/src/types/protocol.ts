@@ -281,6 +281,8 @@ export interface Session {
   id: string
   title: string
   persona_id: string
+  adapter_id?: string
+  working_dir?: string
   status: SessionStatus
   created_at: number
   updated_at: number
