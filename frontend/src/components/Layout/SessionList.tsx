@@ -129,11 +129,13 @@ export default function SessionList({ sendMessage }: SessionListProps) {
       className={`
         flex h-full flex-shrink-0 flex-col border-r border-elaw-subtle-border bg-elaw-panel-bg
         transition-all duration-300 ease-in-out
-        ${isSessionListOpen ? 'w-64' : 'w-0 overflow-hidden'}
+        ${isSessionListOpen ? 'w-full md:w-64' : 'w-0 overflow-hidden'}
       `}
       aria-label="会话列表"
     >
-      <div className="flex h-14 flex-shrink-0 items-center justify-between border-b border-elaw-subtle-border px-4">
+      <MobileSessionListHeader />
+
+      <div className="hidden h-14 flex-shrink-0 items-center justify-between border-b border-elaw-subtle-border px-4 md:flex">
         <span className="font-semibold text-elaw-text-primary">会话</span>
       </div>
 
