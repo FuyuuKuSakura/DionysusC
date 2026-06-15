@@ -1,4 +1,4 @@
-import { ChevronDown, Loader2, CheckCircle2, XCircle, Sparkles } from 'lucide-react'
+import { ChevronDown, Loader2, XCircle, Sparkles } from 'lucide-react'
 import { useChatStore } from '@/stores/chatStore'
 import { useLayoutStore } from '@/stores/layoutStore'
 
