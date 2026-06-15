@@ -11,9 +11,10 @@ interface SettingsPanelProps {
   onClose: () => void
   onOpenThemeStudio?: () => void
   initialTab?: Tab
+  sendMessage?: (message: unknown) => boolean
 }
 
-type Tab = 'appearance' | 'persona' | 'agent'
+type Tab = 'appearance' | 'persona' | 'agent' | 'session'
 
 interface PersonaInfo {
   id: string
@@ -32,7 +33,7 @@ interface AdapterCapability {
   supports_model: boolean
 }
 
-export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, initialTab }: SettingsPanelProps) {
+export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, initialTab, sendMessage }: SettingsPanelProps) {
   const { live2dEnabled, stylePreset, fontSize, setLive2dEnabled, setStylePreset, setFontSize } =
     useSettingsStore()
   const { setTrackingEnabled } = useLive2DStore()
