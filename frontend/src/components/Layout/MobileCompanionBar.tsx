@@ -7,8 +7,8 @@ export default function MobileCompanionBar() {
   const { streamingStatus, todos, companionLine } = useChatStore()
 
   const latestTodo = todos[todos.length - 1]
-  const status = streamingStatus?.status ?? latestTodo?.status ?? 'idle'
-  const detail = streamingStatus?.detail ?? latestTodo?.description ?? companionLine ?? '点击展开角色陪伴'
+  const status = streamingStatus?.status ?? 'idle'
+  const detail = streamingStatus?.detail ?? latestTodo?.text ?? companionLine ?? '点击展开角色陪伴'
 
   const statusIcon = () => {
     switch (status) {
