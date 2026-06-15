@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { useSettingsStore } from '@/stores/settingsStore'
 import { useChatStore } from '@/stores/chatStore'
 import { panelWidthClasses } from '@/lib/layout'
@@ -6,32 +5,16 @@ import Live2DViewer from '../Live2D/Live2DViewer'
 import CharacterDialogBox from '../Character/CharacterDialogBox'
 import ToolPanel from '../Tools/ToolPanel'
 
-interface PersonaInfo {
-  id: string
-  name?: string
-}
-
 export default function RightPanel() {
   const { live2dEnabled } = useSettingsStore()
   const currentSession = useChatStore((state) =>
     state.sessions.find((s) => s.id === state.currentSessionId),
   )
-  const [personas, setPersonas] = useState<PersonaInfo[]>([])
 
-  useEffect(() => {
-    fetch('/api/personas')
-      .then((r) => r.json())
-      .then((data) => {
-        const list = Array.isArray(data) ? data : []
-        setPersonas(list)
-      })
-      .catch(() => setPersonas([]))
-  }, [])
-
-  const personaName =
-    personas.find((p) => p.id === currentSession?.persona_id)?.name ??
-    currentSession?.persona_id ??
-    '角色陪伴'
+  const personaId = currentSession?.persona_id ?? ''
+  const personaName = personaId
+    ? personaId.charAt(0).toUpperCase() + personaId.slice(1)
+    : '角色陪伴'
 
   return (
     <aside
