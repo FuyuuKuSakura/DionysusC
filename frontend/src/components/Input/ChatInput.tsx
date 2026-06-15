@@ -230,8 +230,8 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
           </div>
         )}
 
-        {/* Input row */}
-        <div className="flex items-end gap-2">
+        {/* Textarea */}
+        <div className="flex-1 px-2 pt-10 pb-12">
           <textarea
             ref={textareaRef}
             value={text}
@@ -245,13 +245,17 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
             }}
             rows={computeRows(text)}
             placeholder="给 Agent 发送消息…"
-            className="max-h-32 min-h-11 flex-1 resize-none bg-transparent px-2 py-2 text-sm text-dionysus-text-primary outline-none placeholder:text-dionysus-text-secondary/70"
+            className="max-h-32 min-h-11 w-full resize-none bg-transparent px-2 py-2 pr-10 text-sm text-dionysus-text-primary outline-none placeholder:text-dionysus-text-secondary/70"
           />
+        </div>
+
+        {/* Input row */}
+        <div className="absolute left-3 right-3 bottom-0.5 flex items-end justify-end gap-2">
           <button
             type="button"
             onClick={handleSend}
             disabled={!text.trim()}
-            className="mb-0.5 rounded-lg p-2 text-dionysus-primary transition-colors hover:bg-dionysus-glass-highlight disabled:opacity-40"
+            className="rounded-lg p-2 text-dionysus-primary transition-colors hover:bg-dionysus-glass-highlight disabled:opacity-40"
             aria-label="发送"
             title="发送"
           >
