@@ -517,6 +517,15 @@ export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, init
                 </>
               )}
 
+              {activeTab === 'session' && (
+                <SessionSettingsTab
+                  personas={personas}
+                  adapterOptions={adapterOptions}
+                  sendMessage={sendMessage}
+                  onClose={onClose}
+                />
+              )}
+
               <section className="pt-4 border-t border-elaw-subtle-border">
                 <div className="rounded-xl border-2 border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2.5 text-xs text-elaw-text-secondary">
                   ELAW v0.2.0 · Exusiai Live Agent WebUI
