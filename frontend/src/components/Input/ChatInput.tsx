@@ -157,10 +157,10 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
   const historyMessages = messages.slice(-historyLimit)
 
   return (
-    <div className="relative flex flex-col border border-transparent bg-dionysus-background/10 px-3 py-6 backdrop-blur-xl">
+    <div className="relative flex flex-col border border-transparent bg-dionysus-background/10 px-3 py-8 backdrop-blur-xl">
         {/* Top toolbar */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-0">
+        <div className="absolute left-3 right-3 top-0.5 flex items-center justify-between">
+          <div className="flex items-center gap-1">
             <button
               type="button"
               onClick={() => toggleMode('plan')}
