@@ -647,6 +647,47 @@ class SessionManager:
                 ),
             )
 
+    async def _cmd_switch_persona(
+        self, session_id: str, persona_id: str | None
+    ) -> AsyncIterator[ServerMessage]:
+        if not persona_id:
+            yield SystemNoticeMessage(
+                session_id=session_id,
+                payload=SystemNoticePayload(
+                    text="请提供 persona ID，例如 /persona exusiai",
+                    level="warning",
+                ),
+            )
+            return
+        try:
+            load_persona(persona_id)
+        except Exception:
+            yield SystemNoticeMessage(
+                session_id=session_id,
+                payload=SystemNoticePayload(
+                    text=f"切换失败：找不到角色 `{persona_id}`",
+                    level="error",
+                ),
+            )
+            return
+        session = await self.get_session(session_id)
+        if session is None:
+            yield SystemNoticeMessage(
+                session_id=session_id,
+                payload=SystemNoticePayload(
+                    text="会话不存在", level="error"
+                ),
+            )
+            return
+        session.persona_id = persona_id
+        await self._store.update_session(session)
+        yield SystemNoticeMessage(
+            session_id=session_id,
+            payload=SystemNoticePayload(
+                text=f"已切换到角色：{persona_id}", level="info"
+            ),
+        )
+
     def _get_session_adapter_id(self, session_id: str) -> str:
         adapter = self._session_adapters.get(session_id)
         if adapter is not None:

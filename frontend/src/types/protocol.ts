@@ -104,6 +104,7 @@ export type ClientCommand =
   | 'switch_kimi_session'
   | 'restart_adapter'
   | 'switch_adapter'
+  | 'switch_persona'
 
 export interface ClientCommandMessage extends BaseMessage {
   type: 'client_command'
