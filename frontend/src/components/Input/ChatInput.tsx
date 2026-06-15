@@ -158,7 +158,7 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
 
   return (
     <div className="relative flex flex-col gap-2 border-t border-dionysus-glass-border/30 bg-dionysus-glass-bg/40 px-4 py-3 backdrop-blur-xl">
-      <div className="relative rounded-2xl border border-dionysus-glass-border/40 bg-dionysus-background/60 px-3 py-2 backdrop-blur-xl">
+      <div className="relative rounded-2xl border border-dionysus-glass-border/50 bg-dionysus-glass-bg/80 px-3 py-2 backdrop-blur-xl dark:border-dionysus-glass-border/40 dark:bg-dionysus-background/60">
         {/* Top toolbar */}
         <div className="mb-1 flex items-center justify-between">
           <div className="flex items-center gap-0.5">
