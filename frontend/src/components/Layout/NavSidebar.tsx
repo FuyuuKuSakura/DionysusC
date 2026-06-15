@@ -1,5 +1,6 @@
 import { MessageSquare, Palette, User, Settings } from 'lucide-react'
 import { useLayoutStore, type NavItem } from '@/stores/layoutStore'
+import QRCodeButton from './QRCodeButton'
 
 interface NavItemDef {
   id: NavItem
