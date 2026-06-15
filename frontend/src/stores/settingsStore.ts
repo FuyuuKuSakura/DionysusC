@@ -12,6 +12,7 @@ interface SettingsState {
   wallpaperOpacity: number
   wallpaperBlur: number
   wallpaperBrightness: number
+  historyLimit: number
 
   setFontSize: (value: FontSize) => void
   setLive2dEnabled: (value: boolean) => void
@@ -21,12 +22,14 @@ interface SettingsState {
   setWallpaperOpacity: (value: number) => void
   setWallpaperBlur: (value: number) => void
   setWallpaperBrightness: (value: number) => void
+  setHistoryLimit: (value: number) => void
   resetWallpaper: () => void
 }
 
 const DEFAULT_WALLPAPER_OPACITY = 0.15
 const DEFAULT_WALLPAPER_BLUR = 8
 const DEFAULT_WALLPAPER_BRIGHTNESS = 0.7
+const DEFAULT_HISTORY_LIMIT = 50
 
 export const useSettingsStore = create<SettingsState>()(
   persist(
@@ -39,6 +42,7 @@ export const useSettingsStore = create<SettingsState>()(
       wallpaperOpacity: DEFAULT_WALLPAPER_OPACITY,
       wallpaperBlur: DEFAULT_WALLPAPER_BLUR,
       wallpaperBrightness: DEFAULT_WALLPAPER_BRIGHTNESS,
+      historyLimit: DEFAULT_HISTORY_LIMIT,
       setFontSize: (value) => set({ fontSize: value }),
       setLive2dEnabled: (value) => set({ live2dEnabled: value }),
       setTtsEnabled: (value) => set({ ttsEnabled: value }),
@@ -47,6 +51,7 @@ export const useSettingsStore = create<SettingsState>()(
       setWallpaperOpacity: (value) => set({ wallpaperOpacity: value }),
       setWallpaperBlur: (value) => set({ wallpaperBlur: value }),
       setWallpaperBrightness: (value) => set({ wallpaperBrightness: value }),
+      setHistoryLimit: (value) => set({ historyLimit: value }),
       resetWallpaper: () =>
         set({
           wallpaperUrl: '',
