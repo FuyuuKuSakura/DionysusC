@@ -111,7 +111,7 @@ export default function SessionSettingsPanel({ sendMessage, className = '' }: Se
   if (!session) {
     return (
       <aside
-        className={`flex h-full flex-shrink-0 flex-col border-l border-dionysus-subtle-border bg-dionysus-panel-bg backdrop-blur-xl ${panelWidthClasses()} ${className}`}
+        className={`flex h-full flex-shrink-0 flex-col border-l border-dionysus-subtle-border bg-dionysus-glass-bg backdrop-blur-xl ${panelWidthClasses()} ${className}`}
       >
         <div className="flex h-14 flex-shrink-0 items-center border-b border-dionysus-subtle-border px-4">
           <h2 className="text-base font-semibold text-dionysus-text-primary">会话设置</h2>
@@ -133,7 +133,7 @@ export default function SessionSettingsPanel({ sendMessage, className = '' }: Se
 
   return (
     <aside
-      className={`flex h-full flex-shrink-0 flex-col border-l border-dionysus-subtle-border bg-dionysus-panel-bg backdrop-blur-xl ${panelWidthClasses()} ${className}`}
+      className={`flex h-full flex-shrink-0 flex-col border-l border-dionysus-subtle-border bg-dionysus-glass-bg backdrop-blur-xl ${panelWidthClasses()} ${className}`}
     >
       <div className="flex h-14 flex-shrink-0 items-center border-b border-dionysus-subtle-border px-4">
         <h2 className="text-base font-semibold text-dionysus-text-primary">会话设置</h2>

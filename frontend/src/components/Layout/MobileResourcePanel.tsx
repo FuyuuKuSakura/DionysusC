@@ -19,7 +19,7 @@ export default function MobileResourcePanel({ sendMessage }: MobileResourcePanel
       />
       <SessionSettingsPanel
         sendMessage={sendMessage}
-        className="h-full border-l border-dionysus-subtle-border bg-dionysus-panel-bg"
+        className="h-full border-l border-dionysus-subtle-border"
       />
     </div>
   )

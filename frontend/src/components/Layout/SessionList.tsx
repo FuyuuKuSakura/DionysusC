@@ -87,7 +87,7 @@ export default function SessionList({ sendMessage }: SessionListProps) {
   return (
     <aside
       className={`
-        flex h-full flex-shrink-0 flex-col border-r border-dionysus-subtle-border bg-dionysus-panel-bg
+        flex h-full flex-shrink-0 flex-col border-r border-dionysus-subtle-border bg-dionysus-glass-bg backdrop-blur-xl
         transition-all duration-300 ease-in-out
         ${isSessionListOpen ? 'w-full md:w-64' : 'w-0 overflow-hidden'}
       `}
