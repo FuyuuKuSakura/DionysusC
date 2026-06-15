@@ -72,8 +72,10 @@ async def main():
     print("Session A:", row_a)
     print("Session B:", row_b)
 
-    assert row_a.get("working_dir") == tmp_a, f"A working_dir mismatch: {row_a}"
-    assert row_b.get("working_dir") == tmp_b, f"B working_dir mismatch: {row_b}"
+    resolved_a = str(Path(tmp_a).resolve())
+    resolved_b = str(Path(tmp_b).resolve())
+    assert row_a.get("working_dir") == resolved_a, f"A working_dir mismatch: {row_a}"
+    assert row_b.get("working_dir") == resolved_b, f"B working_dir mismatch: {row_b}"
     assert row_a.get("id") != row_b.get("id"), "sessions must be different"
     print("PASS: per-session workspace isolation verified")
 
