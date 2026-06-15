@@ -80,6 +80,7 @@ export default function Layout({ sendMessage, connected = false }: LayoutProps) 
                 setIsSettingsOpen(true)
               }}
             />
+            <MobileCompanionBar />
             <main className="relative flex flex-1 flex-col overflow-hidden">
               <ChatContainer sendMessage={sendMessage} />
               <ToolHUD />
