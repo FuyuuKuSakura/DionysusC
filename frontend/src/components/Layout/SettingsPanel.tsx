@@ -538,3 +538,182 @@ export default function SettingsPanel({ isOpen, onClose, onOpenThemeStudio, init
     </AnimatePresence>
   )
 }
+
+interface SessionSettingsTabProps {
+  personas: PersonaInfo[]
+  adapterOptions: string[]
+  sendMessage?: (message: unknown) => boolean
+  onClose?: () => void
+}
+
+function SessionSettingsTab({ personas, adapterOptions, sendMessage, onClose }: SessionSettingsTabProps) {
+  const { sessions, currentSessionId, renameSession, updateSession } = useChatStore()
+  const session = sessions.find((s) => s.id === currentSessionId)
+
+  const [title, setTitle] = useState(session?.title ?? '')
+  const [workingDir, setWorkingDir] = useState('')
+  const [selectedPersona, setSelectedPersona] = useState(session?.persona_id ?? 'exusiai')
+  const [selectedAdapter, setSelectedAdapter] = useState(adapterOptions[0] ?? '')
+  const [message, setMessage] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (session) {
+      setTitle(session.title)
+      setSelectedPersona(session.persona_id)
+    }
+  }, [session])
+
+  useEffect(() => {
+    setSelectedAdapter(adapterOptions[0] ?? '')
+  }, [adapterOptions])
+
+  const showMessage = (text: string) => {
+    setMessage(text)
+    setTimeout(() => setMessage(null), 2000)
+  }
+
+  const handleRename = () => {
+    if (!session || !title.trim()) return
+    renameSession(session.id, title.trim())
+    showMessage('会话标题已更新')
+  }
+
+  const handlePersonaChange = (id: string) => {
+    if (!session) return
+    setSelectedPersona(id)
+    updateSession(session.id, { persona_id: id })
+    sendMessage?.({
+      type: 'client_command',
+      payload: { command: 'switch_persona', args: id },
+    })
+    showMessage('角色已切换')
+  }
+
+  const handleSwitchAdapter = () => {
+    if (!selectedAdapter) return
+    sendMessage?.({
+      type: 'client_command',
+      payload: { command: 'switch_adapter', args: selectedAdapter },
+    })
+    showMessage(`已发送切换 adapter 请求：${selectedAdapter}`)
+  }
+
+  const handleChangeWorkingDir = () => {
+    if (!workingDir.trim()) return
+    sendMessage?.({
+      type: 'client_command',
+      payload: { command: 'change_working_dir', args: workingDir.trim() },
+    })
+    showMessage(`已发送切换工作目录请求`)
+  }
+
+  if (!session) {
+    return (
+      <section>
+        <div className="mb-3 flex items-center gap-2 text-sm font-medium text-elaw-text-primary">
+          <Layers className="h-4 w-4 text-elaw-primary" />
+          当前会话
+        </div>
+        <p className="rounded-xl border-2 border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2 text-xs text-elaw-text-secondary">
+          暂无选中会话，请先创建一个会话。
+        </p>
+      </section>
+    )
+  }
+
+  return (
+    <>
+      <section>
+        <div className="mb-3 flex items-center gap-2 text-sm font-medium text-elaw-text-primary">
+          <Layers className="h-4 w-4 text-elaw-primary" />
+          当前会话
+        </div>
+
+        <label className="mb-1.5 block text-xs text-elaw-text-secondary">会话标题</label>
+        <div className="mb-3 flex gap-2">
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="min-w-0 flex-1 rounded-xl border-2 border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2 text-sm text-elaw-text-primary outline-none focus:border-elaw-primary"
+            placeholder="输入会话名称"
+          />
+          <button
+            type="button"
+            onClick={handleRename}
+            disabled={!title.trim() || title.trim() === session.title}
+            className="flex items-center gap-1.5 whitespace-nowrap rounded-xl border-2 border-black/20 bg-elaw-primary px-3 py-1.5 text-xs font-bold text-white shadow-md transition-all hover:brightness-110 disabled:opacity-50"
+          >
+            <Save className="h-3.5 w-3.5" />
+            重命名
+          </button>
+        </div>
+
+        <label className="mb-1.5 block text-xs text-elaw-text-secondary">角色</label>
+        <select
+          value={selectedPersona}
+          onChange={(e) => handlePersonaChange(e.target.value)}
+          className="mb-3 w-full rounded-xl border-2 border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2 text-sm text-elaw-text-primary outline-none focus:border-elaw-primary"
+        >
+          {personas.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.name || p.id}
+            </option>
+          ))}
+        </select>
+
+        <label className="mb-1.5 block text-xs text-elaw-text-secondary">Adapter</label>
+        <div className="mb-3 flex gap-2">
+          <select
+            value={selectedAdapter}
+            onChange={(e) => setSelectedAdapter(e.target.value)}
+            className="min-w-0 flex-1 rounded-xl border-2 border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2 text-sm text-elaw-text-primary outline-none focus:border-elaw-primary"
+          >
+            {adapterOptions.length === 0 && (
+              <option value="">未启用 adapter</option>
+            )}
+            {adapterOptions.map((id) => (
+              <option key={id} value={id}>
+                {id}
+              </option>
+            ))}
+          </select>
+          <button
+            type="button"
+            onClick={handleSwitchAdapter}
+            disabled={!selectedAdapter}
+            className="flex items-center gap-1.5 whitespace-nowrap rounded-xl border-2 border-black/20 bg-elaw-primary px-3 py-1.5 text-xs font-bold text-white shadow-md transition-all hover:brightness-110 disabled:opacity-50"
+          >
+            切换
+          </button>
+        </div>
+
+        <label className="mb-1.5 block text-xs text-elaw-text-secondary">工作目录</label>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={workingDir}
+            onChange={(e) => setWorkingDir(e.target.value)}
+            className="min-w-0 flex-1 rounded-xl border-2 border-elaw-subtle-border bg-elaw-glass-highlight px-3 py-2 text-sm text-elaw-text-primary outline-none focus:border-elaw-primary"
+            placeholder="/Users/..."
+          />
+          <button
+            type="button"
+            onClick={handleChangeWorkingDir}
+            disabled={!workingDir.trim()}
+            className="flex items-center gap-1.5 whitespace-nowrap rounded-xl border-2 border-black/20 bg-elaw-primary px-3 py-1.5 text-xs font-bold text-white shadow-md transition-all hover:brightness-110 disabled:opacity-50"
+          >
+            应用
+          </button>
+        </div>
+
+        {message && (
+          <div className="mt-3 flex items-center gap-1.5 text-xs text-elaw-success">
+            <Check className="h-3.5 w-3.5" />
+            {message}
+          </div>
+        )}
+      </section>
+    </>
+  )
+}

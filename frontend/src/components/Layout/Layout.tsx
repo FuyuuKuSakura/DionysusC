@@ -25,7 +25,7 @@ export default function Layout({ sendMessage, connected = false }: LayoutProps) 
   const { mobileView } = useLayoutStore()
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [isThemeStudioOpen, setIsThemeStudioOpen] = useState(false)
-  const [settingsTab, setSettingsTab] = useState<'appearance' | 'persona' | 'agent'>('appearance')
+  const [settingsTab, setSettingsTab] = useState<'appearance' | 'persona' | 'agent' | 'session'>('appearance')
 
   useEffect(() => {
     loadAllThemes().then(setAvailableThemes).catch(() => {
@@ -92,7 +92,7 @@ export default function Layout({ sendMessage, connected = false }: LayoutProps) 
 
       {/* Mobile overlays */}
       <MobileCompanionDrawer />
-      <MobileResourcePanel />
+      <MobileResourcePanel sendMessage={sendMessage} />
 
       {/* Global settings / theme studio modals */}
       <SettingsPanel
@@ -103,6 +103,7 @@ export default function Layout({ sendMessage, connected = false }: LayoutProps) 
           setIsSettingsOpen(false)
           setIsThemeStudioOpen(true)
         }}
+        sendMessage={sendMessage}
       />
       <ThemeStudio isOpen={isThemeStudioOpen} onClose={() => setIsThemeStudioOpen(false)} />
     </div>
