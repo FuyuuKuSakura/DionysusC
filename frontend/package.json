@@ -1,12 +1,13 @@
 {
   "name": "dionysus-frontend",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "main": "electron/main.cjs",
   "type": "module",
   "build": {
     "appId": "com.dionysus.app",
     "productName": "Dionysus",
+    "icon": "build/icon.icns",
     "directories": {
       "output": "release"
     },
@@ -14,6 +15,21 @@
       "dist/**/*",
       "electron/**/*",
       "package.json"
+    ],
+    "asar": true,
+    "extraResources": [
+      {
+        "from": "../backend/dist",
+        "to": "backend/dist"
+      },
+      {
+        "from": "../backend/config",
+        "to": "backend/config"
+      },
+      {
+        "from": "../frontend/dist",
+        "to": "frontend/dist"
+      }
     ],
     "mac": {
       "target": [

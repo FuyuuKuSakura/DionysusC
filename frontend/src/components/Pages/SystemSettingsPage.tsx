@@ -294,7 +294,7 @@ export default function SystemSettingsPage() {
 
       <section>
         <div className="rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2.5 text-xs text-dionysus-text-secondary">
-          Dionysus v0.1.0 · By FuyuuKu樱
+          Dionysus v0.2.0 · By FuyuuKu樱
         </div>
       </section>
     </div>

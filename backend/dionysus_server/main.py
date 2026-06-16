@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 import json
+import os
 import shutil
 import subprocess
 import uuid
@@ -141,7 +142,7 @@ def create_app() -> FastAPI:
     _load_server_settings(config)
     _load_agent_settings(config)
 
-    app = FastAPI(title="Dionysus Server", version="0.1.0")
+    app = FastAPI(title="Dionysus Server", version="0.2.0")
     theme_dir = get_config_dir() / "themes"
 
     @app.get("/api/themes")
@@ -790,7 +791,10 @@ def create_app() -> FastAPI:
                 status_code=500,
             )
 
-    _wallpaper_dir = Path(__file__).parent.parent / "data" / "wallpapers"
+    _data_root = Path(
+        os.environ.get("Dionysus_DATA_DIR", Path(__file__).parent.parent / "data")
+    )
+    _wallpaper_dir = _data_root / "wallpapers"
     _wallpaper_dir.mkdir(parents=True, exist_ok=True)
 
     def _clear_wallpaper_dir() -> None:

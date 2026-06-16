@@ -37,6 +37,22 @@ kal'tsit_live2d/
 dist/
 build/
 frontend/release/
+frontend/build/
+backend/dist/
+backend/build/
+*.dmg
+*.zip
+*.app
+
+ # Local runtime / test data
+test_workspace/
+logs/
+qa_reports/
+data/
+
+ # Auto-generated docs (keep docs/screenshots/ tracked)
+docs/dionysus_handbook.*
+docs/dionysus_zhihu.md
 
  # QA / test artifacts
 qa_screenshots/
