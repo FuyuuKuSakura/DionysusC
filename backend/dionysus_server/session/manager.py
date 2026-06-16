@@ -45,6 +45,11 @@ from dionysus_server.models import (
 from dionysus_server.persona.companion_engine import CompanionEngine, CompanionReaction
 from dionysus_server.persona.companion_scheduler import CompanionScheduler
 from dionysus_server.persona.loader import load_persona
+from dionysus_server.persona.supervisor import (
+    CompanionSupervisor,
+    SupervisorConfig,
+    load_supervisor_settings,
+)
 from dionysus_server.persona.todo_tracker import TodoTracker
 
 from .store import SessionStore
@@ -130,11 +135,61 @@ class SessionManager:
         self._session_adapters: dict[str, IAgentAdapter] = {}
         self._session_adapter_ids: dict[str, str] = {}
         self._companion_scheduler = CompanionScheduler()
+        self._supervisor: CompanionSupervisor | None = None
+        self._supervisor_adapter: IAgentAdapter | None = None
         self._logger = logger.bind(component="SessionManager")
 
     async def init(self) -> None:
-        """Initialize the underlying store."""
+        """Initialize the underlying store and start the companion supervisor."""
         await self._store.init()
+        settings = load_supervisor_settings()
+        config = SupervisorConfig.from_dict(settings)
+        self._supervisor = CompanionSupervisor(
+            config=config,
+            session_provider=self.list_sessions,
+            emit_callback=self._emit_supervisor_message,
+        )
+        self._supervisor.start()
+
+    async def _emit_supervisor_message(
+        self, session_id: str, message: ServerMessage
+    ) -> None:
+        """Forward supervisor messages to the active WebSocket connection."""
+        # The WebSocket handler injects itself as the emit target by setting
+        # ``broadcast_callback`` after the manager is created.
+        callback = getattr(self, "broadcast_callback", None)
+        if callback is not None:
+            await callback(message)
+
+    async def update_supervisor_config(self, config: SupervisorConfig) -> None:
+        """Update the supervisor configuration and persist it."""
+        from dionysus_server.persona.supervisor import save_supervisor_settings
+
+        save_supervisor_settings(config.to_dict())
+        if self._supervisor is None:
+            self._supervisor = CompanionSupervisor(
+                config=config,
+                session_provider=self.list_sessions,
+                emit_callback=self._emit_supervisor_message,
+            )
+            self._supervisor.start()
+        else:
+            self._supervisor.update_config(config)
+
+    def get_supervisor_config(self) -> SupervisorConfig:
+        """Return the currently configured supervisor settings."""
+        if self._supervisor is not None:
+            return self._supervisor.config
+        return SupervisorConfig.from_dict(load_supervisor_settings())
+
+    async def _get_or_create_supervisor_adapter(
+        self, adapter_id: str | None
+    ) -> IAgentAdapter:
+        """Return a dedicated adapter for the agent_session supervisor mode."""
+        if self._supervisor_adapter is None:
+            self._supervisor_adapter = self.adapters.create_adapter(adapter_id)
+            await self._supervisor_adapter.start()
+        return self._supervisor_adapter
 
     async def create_session(self, persona_id: str) -> Session:
         """Create a new session and keep it in memory."""

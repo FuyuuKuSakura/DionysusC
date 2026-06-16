@@ -28,7 +28,6 @@ export default function PalettePage() {
   const { setTrackingEnabled } = useLive2DStore()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [wallpaperInput, setWallpaperInput] = useState(wallpaperUrl)
-  const initialLoadDone = useRef(false)
 
   useEffect(() => {
     loadAllThemes().then(setAvailableThemes).catch(() => {
@@ -40,54 +39,6 @@ export default function PalettePage() {
     setWallpaperInput(wallpaperUrl)
   }, [wallpaperUrl])
 
-  useEffect(() => {
-    // Restore wallpaper configuration from the server if one has been persisted.
-    fetch('/api/wallpaper')
-      .then((r) => r.json())
-      .then((data) => {
-        if (data) {
-          if (data.url) {
-            setWallpaperUrl(data.url)
-          }
-          if (typeof data.opacity === 'number') {
-            setWallpaperOpacity(data.opacity)
-          }
-          if (typeof data.blur === 'number') {
-            setWallpaperBlur(data.blur)
-          }
-          if (typeof data.brightness === 'number') {
-            setWallpaperBrightness(data.brightness)
-          }
-        }
-      })
-      .catch(() => {
-        // Keep local values if server request fails.
-      })
-  }, [setWallpaperUrl, setWallpaperOpacity, setWallpaperBlur, setWallpaperBrightness])
-
-  // Persist slider parameter changes to the server (debounced).
-  useEffect(() => {
-    if (!initialLoadDone.current) {
-      initialLoadDone.current = true
-      return
-    }
-    const timer = setTimeout(() => {
-      fetch('/api/wallpaper/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          url: wallpaperUrl || null,
-          opacity: wallpaperOpacity,
-          blur: wallpaperBlur,
-          brightness: wallpaperBrightness,
-        }),
-      }).catch(() => {
-        // Ignore network errors; local state is already updated.
-      })
-    }, 500)
-    return () => clearTimeout(timer)
-  }, [wallpaperOpacity, wallpaperBlur, wallpaperBrightness])
-
   const handleLive2dChange = (enabled: boolean) => {
     setLive2dEnabled(enabled)
     setTrackingEnabled(enabled)
@@ -95,21 +46,6 @@ export default function PalettePage() {
 
   const handleWallpaperFile = async (file: File | null) => {
     if (!file) return
-    const form = new FormData()
-    form.append('file', file)
-    try {
-      const res = await fetch('/api/wallpaper', {
-        method: 'POST',
-        body: form,
-      })
-      const data = await res.json()
-      if (res.ok && data.url) {
-        setWallpaperUrl(data.url)
-        return
-      }
-    } catch {
-      // Fall back to local base64 preview if server upload fails.
-    }
     const reader = new FileReader()
     reader.onload = () => {
       const result = reader.result
@@ -120,35 +56,12 @@ export default function PalettePage() {
     reader.readAsDataURL(file)
   }
 
-  const saveWallpaperConfig = async (url: string) => {
-    try {
-      await fetch('/api/wallpaper/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          url: url || null,
-          opacity: wallpaperOpacity,
-          blur: wallpaperBlur,
-          brightness: wallpaperBrightness,
-        }),
-      })
-    } catch {
-      // Ignore network errors; local state is already updated.
-    }
-  }
-
   const applyWallpaperUrl = () => {
     const url = wallpaperInput.trim()
     setWallpaperUrl(url)
-    saveWallpaperConfig(url)
   }
 
   const handleReset = async () => {
-    try {
-      await fetch('/api/wallpaper', { method: 'DELETE' })
-    } catch {
-      // Still reset local state even if the server request fails.
-    }
     resetWallpaper()
     if (fileInputRef.current) {
       fileInputRef.current.value = ''

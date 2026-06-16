@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { User, Save, Upload, Check, FolderOpen, Plus, Unlink, RefreshCcw } from 'lucide-react'
+import { User, Save, Upload, Check, FolderOpen, Plus, Unlink, RefreshCcw, Bot } from 'lucide-react'
 import { useChatStore } from '@/stores/chatStore'
 import { useLive2DStore } from '@/stores/live2dStore'
+
+type SupervisorMode = 'disabled' | 'agent_session' | 'deepseek_api'
 
 interface PersonaInfo {
   id: string
@@ -9,9 +11,27 @@ interface PersonaInfo {
   description?: string
 }
 
+interface SupervisorSettings {
+  mode: SupervisorMode
+  interval_seconds: number
+  adapter_id: string
+  api_url: string
+  api_model: string
+  api_key: string
+}
+
 interface PersonaPageProps {
   onCloseGuardChange?: (guard: () => boolean) => void
   sendMessage?: (message: unknown) => boolean
+}
+
+const DEFAULT_SUPERVISOR: SupervisorSettings = {
+  mode: 'deepseek_api',
+  interval_seconds: 15,
+  adapter_id: '',
+  api_url: 'https://api.deepseek.com/v1/chat/completions',
+  api_model: 'deepseek-reasoner',
+  api_key: '',
 }
 
 export default function PersonaPage({ onCloseGuardChange, sendMessage }: PersonaPageProps) {
@@ -26,6 +46,9 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
   const [live2dPath, setLive2dPath] = useState<string | null>(null)
   const live2dInputRef = useRef<HTMLInputElement>(null)
   const yamlInputRef = useRef<HTMLInputElement>(null)
+
+  const [supervisor, setSupervisor] = useState<SupervisorSettings>(DEFAULT_SUPERVISOR)
+  const [loadedSupervisor, setLoadedSupervisor] = useState<SupervisorSettings>(DEFAULT_SUPERVISOR)
 
   const sessions = useChatStore((state) => state.sessions)
   const currentSessionId = useChatStore((state) => state.currentSessionId)
@@ -52,6 +75,24 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
 
   useEffect(() => {
     refreshPersonas()
+    fetch('/api/settings/supervisor')
+      .then((r) => r.json())
+      .then((data) => {
+        const cfg: SupervisorSettings = {
+          mode: data.mode || 'deepseek_api',
+          interval_seconds: data.interval_seconds ?? 15,
+          adapter_id: data.adapter_id || '',
+          api_url: data.api_url || DEFAULT_SUPERVISOR.api_url,
+          api_model: data.api_model || DEFAULT_SUPERVISOR.api_model,
+          api_key: data.api_key || '',
+        }
+        setSupervisor(cfg)
+        setLoadedSupervisor(cfg)
+      })
+      .catch(() => {
+        setSupervisor(DEFAULT_SUPERVISOR)
+        setLoadedSupervisor(DEFAULT_SUPERVISOR)
+      })
   }, [])
 
   useEffect(() => {
@@ -82,15 +123,16 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
   }, [selectedPersona])
 
   const isDirty = corpusText !== loadedCorpus
+  const supervisorDirty = JSON.stringify(supervisor) !== JSON.stringify(loadedSupervisor)
 
   useEffect(() => {
     const guard = () => {
-      if (!isDirty) return true
-      return window.confirm('当前角色的语料有未保存的修改，确定要放弃吗？')
+      if (!isDirty && !supervisorDirty) return true
+      return window.confirm('当前页面有未保存的修改，确定要放弃吗？')
     }
     onCloseGuardChange?.(guard)
     return () => onCloseGuardChange?.(() => true)
-  }, [isDirty, onCloseGuardChange])
+  }, [isDirty, supervisorDirty, onCloseGuardChange])
 
   const maybeSwitchPersona = (id: string) => {
     if (sendMessage && id !== currentPersonaId) {
@@ -269,6 +311,45 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
     }
   }
 
+  const saveSupervisor = async () => {
+    setSaving(true)
+    setMessage(null)
+    try {
+      const res = await fetch('/api/settings/supervisor', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode: supervisor.mode,
+          interval_seconds: supervisor.interval_seconds,
+          adapter_id: supervisor.adapter_id,
+          api_url: supervisor.api_url,
+          api_model: supervisor.api_model,
+          api_key: supervisor.api_key,
+        }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        const cfg: SupervisorSettings = {
+          mode: data.mode || supervisor.mode,
+          interval_seconds: data.interval_seconds ?? supervisor.interval_seconds,
+          adapter_id: data.adapter_id ?? supervisor.adapter_id,
+          api_url: data.api_url ?? supervisor.api_url,
+          api_model: data.api_model ?? supervisor.api_model,
+          api_key: supervisor.api_key,
+        }
+        setSupervisor(cfg)
+        setLoadedSupervisor(cfg)
+        setMessage('Supervisor 设置已保存')
+      } else {
+        setMessage(`保存失败：${data.error || '未知错误'}`)
+      }
+    } catch {
+      setMessage('保存失败')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   const selectedDescription = personas.find((p) => p.id === selectedPersona)?.description
 
   return (
@@ -427,6 +508,113 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
             请选择包含 .model3.json 入口文件的 Live2D 模型文件夹。
           </p>
         )}
+      </section>
+
+      <section>
+        <div className="mb-3 flex items-center gap-2 text-sm font-medium text-dionysus-text-primary">
+          <Bot className="h-4 w-4 text-dionysus-primary" />
+          后台角色播报（Companion Supervisor）
+          {supervisorDirty && <span className="ml-2 text-xs text-dionysus-danger">已修改</span>}
+        </div>
+        <div className="space-y-3 rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight p-3">
+          <div>
+            <label className="mb-1.5 block text-xs text-dionysus-text-secondary">工作模式</label>
+            <div className="flex gap-2">
+              {(
+                [
+                  { id: 'disabled', label: '不接入模型' },
+                  { id: 'agent_session', label: '多开 agent session' },
+                  { id: 'deepseek_api', label: 'DeepSeek API' },
+                ] as { id: SupervisorMode; label: string }[]
+              ).map(({ id, label }) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setSupervisor((s) => ({ ...s, mode: id }))}
+                  className={`flex-1 rounded-xl border-2 px-2 py-2 text-xs font-bold transition-all ${
+                    supervisor.mode === id
+                      ? 'border-dionysus-primary bg-dionysus-primary/15 text-dionysus-primary'
+                      : 'border-dionysus-subtle-border bg-dionysus-glass-highlight text-dionysus-text-secondary'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {supervisor.mode === 'agent_session' && (
+            <div>
+              <label className="mb-1.5 block text-xs text-dionysus-text-secondary">Adapter ID</label>
+              <input
+                type="text"
+                value={supervisor.adapter_id}
+                onChange={(e) => setSupervisor((s) => ({ ...s, adapter_id: e.target.value }))}
+                className="w-full rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-sm text-dionysus-text-primary outline-none focus:border-dionysus-primary"
+                placeholder="例如 kimi_cli"
+              />
+            </div>
+          )}
+
+          {supervisor.mode === 'deepseek_api' && (
+            <>
+              <div>
+                <label className="mb-1.5 block text-xs text-dionysus-text-secondary">API URL</label>
+                <input
+                  type="text"
+                  value={supervisor.api_url}
+                  onChange={(e) => setSupervisor((s) => ({ ...s, api_url: e.target.value }))}
+                  className="w-full rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-sm text-dionysus-text-primary outline-none focus:border-dionysus-primary"
+                />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-xs text-dionysus-text-secondary">模型</label>
+                <input
+                  type="text"
+                  value={supervisor.api_model}
+                  onChange={(e) => setSupervisor((s) => ({ ...s, api_model: e.target.value }))}
+                  className="w-full rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-sm text-dionysus-text-primary outline-none focus:border-dionysus-primary"
+                />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-xs text-dionysus-text-secondary">API Key</label>
+                <input
+                  type="password"
+                  value={supervisor.api_key}
+                  onChange={(e) => setSupervisor((s) => ({ ...s, api_key: e.target.value }))}
+                  className="w-full rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-sm text-dionysus-text-primary outline-none focus:border-dionysus-primary"
+                  placeholder="留空则读取环境变量 DEEPSEEK_API_KEY"
+                />
+              </div>
+            </>
+          )}
+
+          <div>
+            <label className="mb-1.5 block text-xs text-dionysus-text-secondary">
+              扫描间隔（秒）
+            </label>
+            <input
+              type="number"
+              min={5}
+              step={1}
+              value={supervisor.interval_seconds}
+              onChange={(e) =>
+                setSupervisor((s) => ({ ...s, interval_seconds: Number(e.target.value) }))
+              }
+              className="w-full rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-sm text-dionysus-text-primary outline-none focus:border-dionysus-primary"
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={saveSupervisor}
+            disabled={!supervisorDirty || saving}
+            className="flex w-full items-center justify-center gap-1.5 rounded-xl border-2 border-black/20 bg-dionysus-primary px-3 py-2 text-xs font-bold text-white shadow-md transition-all hover:brightness-110 disabled:opacity-50"
+          >
+            <Save className="h-3.5 w-3.5" />
+            保存 Supervisor 设置
+          </button>
+        </div>
       </section>
     </div>
   )

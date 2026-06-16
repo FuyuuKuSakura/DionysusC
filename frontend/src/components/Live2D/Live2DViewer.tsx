@@ -24,8 +24,20 @@ const CLICK_COOLDOWN_MS = 600
 settings.PREFER_ENV = ENV.WEBGL_LEGACY
 BatchRenderer.defaultMaxTextures = 1
 
-const HEAD_LINES = ['老板？', '看这里～']
-const BODY_LINES = ['嘿嘿～', '呀吼～']
+interface TouchZone {
+  expression: string
+  lines: string[]
+}
+
+interface CompanionConfig {
+  live2d: {
+    model_path?: string
+  }
+  touch_zones?: {
+    head?: TouchZone
+    body?: TouchZone
+  }
+}
 
 const PRESENCE_DOT_COLORS: Record<
   ReturnType<typeof useLive2DStore.getState>['presenceState'],
@@ -55,6 +67,7 @@ export default function Live2DViewer({
   const [error, setError] = useState<string | null>(null)
   const [retryKey, setRetryKey] = useState(0)
   const [modelUrl, setModelUrl] = useState(DEFAULT_MODEL_URL)
+  const [companionConfig, setCompanionConfig] = useState<CompanionConfig | null>(null)
 
   const currentSessionId = useChatStore((state) => state.currentSessionId)
   const personaId =
@@ -66,7 +79,10 @@ export default function Live2DViewer({
     fetch(`/api/personas/${personaId}/companion`)
       .then((r) => (r.ok ? r.json() : null))
       .then((data) => {
-        const path = data?.model_path
+        if (data) {
+          setCompanionConfig(data)
+        }
+        const path = data?.live2d?.model_path
         if (path) {
           setModelUrl(path)
         }
@@ -220,14 +236,16 @@ export default function Live2DViewer({
 
         const resizeModel = () => {
           if (!model || !app) return
-          const scale = Math.min(
+          const baseScale = Math.min(
             app.screen.width / 1600,
             app.screen.height / 1800,
           )
-          model.scale.set(Math.max(0.2, scale))
+          // Shrink so models with large hair/ears/background stay inside the panel.
+          const scale = baseScale * 0.32
+          model.scale.set(Math.max(0.1, scale))
           model.anchor.set(0.5, 0.5)
           model.x = app.screen.width / 2
-          model.y = app.screen.height / 2 + app.screen.height * 0.1
+          model.y = app.screen.height / 2
         }
 
         resizeModel()
@@ -353,15 +371,21 @@ export default function Live2DViewer({
       const normY = -(clientY - centerY) / halfHeight
 
       const isHead = normY > 0.35
-      const expressionName = isHead ? '？' : '脸红'
-      const lines = isHead ? HEAD_LINES : BODY_LINES
+      const zone = isHead
+        ? companionConfig?.touch_zones?.head
+        : companionConfig?.touch_zones?.body
+      const expressionName = zone?.expression ?? (isHead ? '？' : '脸红')
+      const defaultLines = isHead
+        ? ['老板？', '看这里～']
+        : ['嘿嘿～', '呀吼～']
+      const lines = zone?.lines ?? defaultLines
       const line = lines[Math.floor(Math.random() * lines.length)]
 
       useChatStore.getState().setCompanionLine(line)
       useLive2DStore.getState().requestExpression(expressionName)
       bumpActivity()
     },
-    [bumpActivity],
+    [bumpActivity, companionConfig],
   )
 
   const handlePointerDown = useCallback(

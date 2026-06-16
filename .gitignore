@@ -19,6 +19,7 @@ yarn-error.log*
 
  # Backend data & generated files
 backend/data/
+backend/dionysus_server/data/
 backend/*.db
 backend/*.sqlite3
 

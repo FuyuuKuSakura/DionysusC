@@ -17,7 +17,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
 from dionysus_server.config import get_config_dir, load_config
-from dionysus_server.models import HandshakeMessage, HandshakePayload
+from dionysus_server.models import HandshakeMessage, HandshakePayload, ServerMessage
 from dionysus_server.persona.loader import (
     _BUILTIN_DIR,
     _PERSONA_DIR,
@@ -550,6 +550,39 @@ def create_app() -> FastAPI:
         buf.seek(0)
         return StreamingResponse(buf, media_type="image/png")
 
+    @app.get("/api/settings/supervisor")
+    async def get_supervisor_settings() -> JSONResponse:
+        """Return the companion supervisor configuration."""
+        cfg = manager.get_supervisor_config()
+        return JSONResponse(content={k: v for k, v in cfg.to_dict().items() if k != "api_key"})
+
+    @app.post("/api/settings/supervisor")
+    async def update_supervisor_settings(request: Request) -> JSONResponse:
+        """Update and persist the companion supervisor configuration."""
+        from dionysus_server.persona.supervisor import SupervisorConfig
+
+        body = await request.json()
+        current = manager.get_supervisor_config()
+        merged = current.to_dict()
+        for key in ("mode", "interval_seconds", "adapter_id", "api_url", "api_model", "api_key"):
+            if key in body:
+                merged[key] = body[key]
+        try:
+            interval = float(merged.get("interval_seconds", 15))
+            if interval < 5:
+                raise ValueError("interval too small")
+        except (ValueError, TypeError):
+            return JSONResponse(
+                status_code=400, content={"error": "invalid_interval_seconds"}
+            )
+        if merged.get("mode") not in ("disabled", "agent_session", "deepseek_api"):
+            return JSONResponse(status_code=400, content={"error": "invalid_mode"})
+        config_obj = SupervisorConfig.from_dict(merged)
+        await manager.update_supervisor_config(config_obj)
+        return JSONResponse(
+            content={k: v for k, v in config_obj.to_dict().items() if k != "api_key"}
+        )
+
     manager = SessionManager(config)
 
     @app.on_event("startup")
@@ -588,6 +621,15 @@ def create_app() -> FastAPI:
 
         handler = MessageHandler(manager, connection, on_new_session=on_new_session)
 
+        # Bind the active connection so supervisor broadcasts reach the client.
+        async def broadcast_callback(message: ServerMessage) -> None:
+            try:
+                await connection.send_message(message)
+            except Exception:
+                pass
+
+        manager.broadcast_callback = broadcast_callback
+
         await connection.accept(session)
 
         try:
@@ -599,6 +641,7 @@ def create_app() -> FastAPI:
         except WebSocketDisconnect:
             logger.info("websocket_disconnected", session_id=connection.session_id)
         finally:
+            manager.broadcast_callback = None
             await manager.close_adapter(connection.session_id or session.id)
             await connection.close()
 
