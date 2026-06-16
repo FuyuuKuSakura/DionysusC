@@ -54,7 +54,7 @@ export default function NavSidebar({
       aria-label="主导航"
     >
       <div className="mb-6 flex h-10 w-10 items-center justify-center rounded-xl bg-dionysus-primary text-lg font-bold text-white shadow-md">
-        D
+        <img src="/icon.png" alt="Dionysus" className="h-10 w-10 rounded-xl object-cover" />
       </div>
 
       <div className="flex flex-1 flex-col gap-3">

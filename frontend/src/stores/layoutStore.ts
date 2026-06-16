@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
 export type NavItem = 'sessions' | 'themes' | 'character' | 'settings'
 type MobileView = 'session-list' | 'chat'
@@ -27,24 +28,32 @@ interface LayoutState {
   toggleResourcePanel: () => void
 }
 
-export const useLayoutStore = create<LayoutState>()((set) => ({
-  activeNav: 'sessions',
-  setActiveNav: (activeNav) => set({ activeNav }),
+export const useLayoutStore = create<LayoutState>()(
+  persist(
+    (set) => ({
+      activeNav: 'sessions',
+      setActiveNav: (activeNav) => set({ activeNav }),
 
-  isSessionListOpen: true,
-  toggleSessionList: () => set((state) => ({ isSessionListOpen: !state.isSessionListOpen })),
-  setSessionListOpen: (isSessionListOpen) => set({ isSessionListOpen }),
+      isSessionListOpen: true,
+      toggleSessionList: () => set((state) => ({ isSessionListOpen: !state.isSessionListOpen })),
+      setSessionListOpen: (isSessionListOpen) => set({ isSessionListOpen }),
 
-  mobileView: 'session-list',
-  setMobileView: (mobileView) => set({ mobileView }),
+      mobileView: 'session-list',
+      setMobileView: (mobileView) => set({ mobileView }),
 
-  isCompanionDrawerOpen: false,
-  setCompanionDrawerOpen: (isCompanionDrawerOpen) => set({ isCompanionDrawerOpen }),
-  toggleCompanionDrawer: () =>
-    set((state) => ({ isCompanionDrawerOpen: !state.isCompanionDrawerOpen })),
+      isCompanionDrawerOpen: false,
+      setCompanionDrawerOpen: (isCompanionDrawerOpen) => set({ isCompanionDrawerOpen }),
+      toggleCompanionDrawer: () =>
+        set((state) => ({ isCompanionDrawerOpen: !state.isCompanionDrawerOpen })),
 
-  isResourcePanelOpen: false,
-  setResourcePanelOpen: (isResourcePanelOpen) => set({ isResourcePanelOpen }),
-  toggleResourcePanel: () =>
-    set((state) => ({ isResourcePanelOpen: !state.isResourcePanelOpen })),
-}))
+      isResourcePanelOpen: false,
+      setResourcePanelOpen: (isResourcePanelOpen) => set({ isResourcePanelOpen }),
+      toggleResourcePanel: () =>
+        set((state) => ({ isResourcePanelOpen: !state.isResourcePanelOpen })),
+    }),
+    {
+      name: 'dionysus-cache-layout',
+      partialize: (state) => ({ isSessionListOpen: state.isSessionListOpen }),
+    },
+  ),
+)

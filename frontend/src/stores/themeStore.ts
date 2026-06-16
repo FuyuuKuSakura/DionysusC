@@ -40,8 +40,11 @@ export const useThemeStore = create<ThemeState>()(
       setAvailableThemes: (themes) => set({ availableThemes: themes }),
     }),
     {
-      name: 'dionysus-theme',
-      partialize: (state) => ({ currentTheme: state.currentTheme }),
+      name: 'dionysus-cache-theme',
+      partialize: (state) => ({
+        currentTheme: state.currentTheme,
+        availableThemes: state.availableThemes,
+      }),
       onRehydrateStorage: () => (state) => {
         if (!state) return
         // Migrate legacy or stale theme variants to the current default.

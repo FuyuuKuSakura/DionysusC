@@ -137,7 +137,7 @@ export default function SessionList({ sendMessage }: SessionListProps) {
                       group relative flex w-full flex-col rounded-xl border px-3 py-2 text-left transition-all
                       ${
                         isActive
-                          ? 'border-dionysus-primary/30 bg-dionysus-primary/10'
+                          ? 'border-transparent bg-dionysus-primary/10'
                           : 'border-transparent bg-dionysus-glass-highlight/50 hover:border-dionysus-subtle-border hover:bg-dionysus-glass-highlight'
                       }
                     `}

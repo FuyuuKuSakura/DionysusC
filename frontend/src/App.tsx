@@ -171,18 +171,31 @@ function App() {
       }
       case 'emotion_update': {
         const { emotion, live2d_expression, live2d_motion } = message.payload
-        const liveStore = useLive2DStore.getState()
-        liveStore.setCurrentEmotion(emotion)
-        if (live2d_expression) {
-          liveStore.requestExpression(live2d_expression)
+        const targetSessionId =
+          message.session_id === 'global' ? store.currentSessionId : message.session_id
+        if (targetSessionId) {
+          store.setSessionCompanionEmotion(targetSessionId, emotion)
         }
-        if (live2d_motion) {
-          liveStore.requestMotion(live2d_motion)
+        const isCurrentSession =
+          message.session_id === 'global' || message.session_id === store.currentSessionId
+        if (isCurrentSession) {
+          const liveStore = useLive2DStore.getState()
+          liveStore.setCurrentEmotion(emotion)
+          if (live2d_expression) {
+            liveStore.requestExpression(live2d_expression)
+          }
+          if (live2d_motion) {
+            liveStore.requestMotion(live2d_motion)
+          }
         }
         break
       }
       case 'companion_message': {
-        useChatStore.getState().setCompanionLine(message.payload.text)
+        const targetSessionId =
+          message.session_id === 'global' ? store.currentSessionId : message.session_id
+        if (targetSessionId) {
+          store.setSessionCompanionLine(targetSessionId, message.payload.text)
+        }
         break
       }
       case 'todo_update': {

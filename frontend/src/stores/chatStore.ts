@@ -36,6 +36,7 @@ interface ChatState {
   activeToolCallId: string | null
   companionLine: string | null
   companionHistory: string[]
+  sessionCompanion: Record<string, { line: string | null; emotion: string | null; history: string[] }>
   todos: TodoItem[]
 
   addSession: (session?: Partial<Session>) => Session
@@ -53,6 +54,8 @@ interface ChatState {
   setStreamingStatus: (status: StatusUpdateMessage['payload'] | null) => void
   setSessionStatus: (status: SessionStatus) => void
   setCompanionLine: (line: string | null) => void
+  setSessionCompanionLine: (sessionId: string, line: string | null) => void
+  setSessionCompanionEmotion: (sessionId: string, emotion: string | null) => void
   setTodos: (items: TodoItem[]) => void
   appendSystemMessage: (text: string, level?: 'info' | 'warning' | 'error') => void
   loadSessionMessages: (sessionId: string, messages: ChatMessage[]) => void
@@ -62,22 +65,25 @@ interface ChatState {
   clearToolCalls: () => void
 }
 
-export const useChatStore = create<ChatState>()((set, get) => ({
-  sessions: [],
-  currentSessionId: null,
-  messages: [],
-  isStreaming: false,
-  currentOptions: null,
-  currentOptionsUiType: null,
-  optionDisabled: false,
-  streamingStatus: null,
-  toolCalls: [],
-  activeToolCallId: null,
-  companionLine: null,
-  companionHistory: [],
-  todos: [],
+export const useChatStore = create<ChatState>()(
+  persist(
+    (set, get) => ({
+      sessions: [],
+      currentSessionId: null,
+      messages: [],
+      isStreaming: false,
+      currentOptions: null,
+      currentOptionsUiType: null,
+      optionDisabled: false,
+      streamingStatus: null,
+      toolCalls: [],
+      activeToolCallId: null,
+      companionLine: null,
+      companionHistory: [],
+      sessionCompanion: {},
+      todos: [],
 
-  addSession: (session) => {
+      addSession: (session) => {
     const now = Date.now()
     const newSession: Session = {
       id: generateId(),
@@ -100,12 +106,17 @@ export const useChatStore = create<ChatState>()((set, get) => ({
       streamingStatus: null,
       companionLine: null,
       companionHistory: [],
+      sessionCompanion: {
+        ...state.sessionCompanion,
+        [newSession.id]: { line: null, emotion: null, history: [] },
+      },
     }))
     return newSession
   },
 
   setCurrentSession: (sessionId) => {
     const session = get().sessions.find((s) => s.id === sessionId)
+    const companion = get().sessionCompanion[sessionId]
     set({
       currentSessionId: sessionId,
       messages: session?.messages ?? [],
@@ -116,24 +127,33 @@ export const useChatStore = create<ChatState>()((set, get) => ({
       streamingStatus: null,
       toolCalls: [],
       activeToolCallId: null,
-      companionLine: null,
-      companionHistory: [],
+      companionLine: companion?.line ?? null,
+      companionHistory: companion?.history ?? [],
     })
   },
 
   deleteSession: (sessionId) => {
     set((state) => {
       const filtered = state.sessions.filter((s) => s.id !== sessionId)
+      const { [sessionId]: _, ...remainingCompanion } = state.sessionCompanion
       let nextSessionId = state.currentSessionId
       let nextMessages: ChatMessage[] = state.messages
+      let nextCompanionLine = state.companionLine
+      let nextCompanionHistory = state.companionHistory
       if (state.currentSessionId === sessionId) {
         nextSessionId = filtered[0]?.id ?? null
         nextMessages = filtered[0]?.messages ?? []
+        const nextCompanion = nextSessionId ? remainingCompanion[nextSessionId] : undefined
+        nextCompanionLine = nextCompanion?.line ?? null
+        nextCompanionHistory = nextCompanion?.history ?? []
       }
       return {
         sessions: filtered,
         currentSessionId: nextSessionId,
         messages: nextMessages,
+        sessionCompanion: remainingCompanion,
+        companionLine: nextCompanionLine,
+        companionHistory: nextCompanionHistory,
       }
     })
   },
@@ -333,14 +353,63 @@ export const useChatStore = create<ChatState>()((set, get) => ({
   },
 
   setCompanionLine: (companionLine) => {
-    if (!companionLine) {
-      set({ companionLine: null })
+    const sessionId = get().currentSessionId
+    if (!sessionId) {
+      set({ companionLine: companionLine })
       return
     }
-    set((state) => ({
-      companionLine,
-      companionHistory: [companionLine, ...state.companionHistory].slice(0, 20),
-    }))
+    get().setSessionCompanionLine(sessionId, companionLine)
+  },
+
+  setSessionCompanionLine: (sessionId, line) => {
+    if (!sessionId) return
+    set((state) => {
+      const current = state.sessionCompanion[sessionId] ?? {
+        line: null,
+        emotion: null,
+        history: [],
+      }
+      const isCurrent = state.currentSessionId === sessionId
+      if (!line) {
+        return {
+          sessionCompanion: {
+            ...state.sessionCompanion,
+            [sessionId]: { ...current, line: null },
+          },
+          ...(isCurrent ? { companionLine: null } : {}),
+        }
+      }
+      const nextHistory = [line, ...current.history.filter((l) => l !== line)].slice(
+        0,
+        20,
+      )
+      return {
+        sessionCompanion: {
+          ...state.sessionCompanion,
+          [sessionId]: { ...current, line, history: nextHistory },
+        },
+        ...(isCurrent
+          ? { companionLine: line, companionHistory: nextHistory }
+          : {}),
+      }
+    })
+  },
+
+  setSessionCompanionEmotion: (sessionId, emotion) => {
+    if (!sessionId) return
+    set((state) => {
+      const current = state.sessionCompanion[sessionId] ?? {
+        line: null,
+        emotion: null,
+        history: [],
+      }
+      return {
+        sessionCompanion: {
+          ...state.sessionCompanion,
+          [sessionId]: { ...current, emotion },
+        },
+      }
+    })
   },
 
   setTodos: (todos) => set({ todos }),
@@ -377,22 +446,25 @@ export const useChatStore = create<ChatState>()((set, get) => ({
   },
 
   loadSessionMessages: (sessionId, messages) => {
-    set((state) => ({
-      currentSessionId: sessionId,
-      messages,
-      sessions: state.sessions.map((s) =>
-        s.id === sessionId ? { ...s, messages } : s,
-      ),
-      currentOptions: null,
-      currentOptionsUiType: null,
-      optionDisabled: false,
-      isStreaming: false,
-      streamingStatus: null,
-      toolCalls: [],
-      activeToolCallId: null,
-      companionLine: null,
-      companionHistory: [],
-    }))
+    set((state) => {
+      const companion = state.sessionCompanion[sessionId]
+      return {
+        currentSessionId: sessionId,
+        messages,
+        sessions: state.sessions.map((s) =>
+          s.id === sessionId ? { ...s, messages } : s,
+        ),
+        currentOptions: null,
+        currentOptionsUiType: null,
+        optionDisabled: false,
+        isStreaming: false,
+        streamingStatus: null,
+        toolCalls: [],
+        activeToolCallId: null,
+        companionLine: companion?.line ?? null,
+        companionHistory: companion?.history ?? [],
+      }
+    })
   },
 
   addToolCall: ({ name, args }) => {
@@ -436,4 +508,21 @@ export const useChatStore = create<ChatState>()((set, get) => ({
   clearToolCalls: () => {
     set({ toolCalls: [], activeToolCallId: null })
   },
-}))
+    }),
+    {
+      name: 'dionysus-cache-chat',
+      partialize: (state) => ({
+        sessions: state.sessions,
+        currentSessionId: state.currentSessionId,
+      }),
+      onRehydrateStorage: () => (state) => {
+        if (!state) return
+        // Restore the active messages from the persisted current session.
+        const session = state.sessions.find((s) => s.id === state.currentSessionId)
+        if (session) {
+          state.messages = session.messages
+        }
+      },
+    },
+  ),
+)

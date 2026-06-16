@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Bot, Save, History } from 'lucide-react'
+import { Bot, Save, History, Trash2 } from 'lucide-react'
 import { useSettingsStore } from '@/stores/settingsStore'
 
 interface AgentConfig {
@@ -127,6 +127,18 @@ export default function SystemSettingsPage() {
     }
   }
 
+  const clearLocalCache = () => {
+    const keysToRemove: string[] = []
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i)
+      if (key && (key.startsWith('dionysus-cache-') || key === 'dionysus-settings')) {
+        keysToRemove.push(key)
+      }
+    }
+    keysToRemove.forEach((key) => localStorage.removeItem(key))
+    window.location.reload()
+  }
+
   const adapterIds = Object.keys(agentConfig?.adapters || {})
 
   return (
@@ -246,8 +258,19 @@ export default function SystemSettingsPage() {
       </section>
 
       <section className="border-t border-dionysus-subtle-border pt-4">
+        <button
+          type="button"
+          onClick={clearLocalCache}
+          className="flex w-full items-center justify-center gap-1.5 rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-xs font-bold text-dionysus-text-secondary transition-colors hover:border-dionysus-danger/50 hover:text-dionysus-danger"
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+          清除本地缓存
+        </button>
+      </section>
+
+      <section>
         <div className="rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2.5 text-xs text-dionysus-text-secondary">
-          Dionysus v0.2.0 · Dionysus Agent Companion
+          Dionysus v0.1.0 · By FuyuuKu樱
         </div>
       </section>
     </div>

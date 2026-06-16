@@ -43,6 +43,7 @@ from dionysus_server.models import (
     SystemNoticePayload,
 )
 from dionysus_server.persona.companion_engine import CompanionEngine, CompanionReaction
+from dionysus_server.persona.companion_scheduler import CompanionScheduler
 from dionysus_server.persona.loader import load_persona
 from dionysus_server.persona.todo_tracker import TodoTracker
 
@@ -128,6 +129,7 @@ class SessionManager:
         self.active_sessions: dict[str, Session] = {}
         self._session_adapters: dict[str, IAgentAdapter] = {}
         self._session_adapter_ids: dict[str, str] = {}
+        self._companion_scheduler = CompanionScheduler()
         self._logger = logger.bind(component="SessionManager")
 
     async def init(self) -> None:
@@ -168,6 +170,7 @@ class SessionManager:
         await self.close_adapter(session_id)
         await self._store.delete_session(session_id)
         self.active_sessions.pop(session_id, None)
+        self._companion_scheduler.remove_session(session_id)
 
     async def get_or_create_adapter(self, session_id: str) -> IAgentAdapter:
         """Return the adapter for a session, creating and starting it if needed."""
@@ -224,6 +227,32 @@ class SessionManager:
         except Exception:
             self._logger.exception(
                 "system_prompt_injection_failed", session_id=session.id
+            )
+
+    async def _yield_scheduler_reaction(
+        self, session_id: str, status: str
+    ) -> AsyncIterator[ServerMessage]:
+        """Notify the global companion scheduler and yield its reaction."""
+        reaction = self._companion_scheduler.on_session_status(session_id, status)
+        if reaction is None:
+            return
+        yield CompanionMessage(
+            session_id="global",
+            payload=CompanionMessagePayload(
+                text=reaction.text,
+                emotion=reaction.emotion,
+                sticker_id=reaction.sticker_id,
+            ),
+        )
+        if reaction.live2d_expression or reaction.live2d_motion:
+            yield EmotionUpdateMessage(
+                session_id="global",
+                payload=EmotionUpdatePayload(
+                    emotion=reaction.emotion,
+                    live2d_expression=reaction.live2d_expression,
+                    live2d_motion=reaction.live2d_motion,
+                    confidence=1.0,
+                ),
             )
 
     async def _stream_agent_response(
@@ -284,6 +313,9 @@ class SessionManager:
 
         session.status = SessionStatus.PROCESSING
         await self._store.update_session(session)
+
+        async for scheduler_msg in self._yield_scheduler_reaction(session_id, "working"):
+            yield scheduler_msg
 
         await self._inject_system_prompt_if_needed(session)
 
@@ -350,6 +382,11 @@ class SessionManager:
                 payload=AgentCompletePayload(status="error", error_message=str(exc)),
             )
 
+        async for scheduler_msg in self._yield_scheduler_reaction(
+            session_id, complete_status
+        ):
+            yield scheduler_msg
+
         await self._finalize_agent_turn(session, agent_content_parts, complete_status)
 
     async def handle_option_selected(
@@ -371,6 +408,9 @@ class SessionManager:
         session.status = SessionStatus.PROCESSING
         await self._store.update_session(session)
 
+        async for scheduler_msg in self._yield_scheduler_reaction(session_id, "working"):
+            yield scheduler_msg
+
         agent_input = AgentInput(text=selected_label)
         agent_content_parts: list[str] = []
         complete_status = "success"
@@ -387,6 +427,11 @@ class SessionManager:
             elif server_message.type.value == "agent_complete":
                 complete_status = server_message.payload.status  # type: ignore[attr-defined]
                 break
+
+        async for scheduler_msg in self._yield_scheduler_reaction(
+            session_id, complete_status
+        ):
+            yield scheduler_msg
 
         await self._finalize_agent_turn(session, agent_content_parts, complete_status)
 
@@ -419,6 +464,9 @@ class SessionManager:
 
         session.status = SessionStatus.INTERRUPTED
         await self._store.update_session(session)
+
+        async for scheduler_msg in self._yield_scheduler_reaction(session_id, "error"):
+            yield scheduler_msg
 
     async def handle_client_command(
         self,

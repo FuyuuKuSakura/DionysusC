@@ -231,7 +231,7 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
         )}
 
         {/* Textarea */}
-        <div className="flex-1 px-2 pt-10 pb-12">
+        <div className="absolute inset-x-3 top-8 bottom-8">
           <textarea
             ref={textareaRef}
             value={text}
@@ -245,7 +245,7 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
             }}
             rows={computeRows(text)}
             placeholder="给 Agent 发送消息…"
-            className="max-h-32 min-h-11 w-full resize-none bg-transparent px-2 py-2 pr-10 text-sm text-dionysus-text-primary outline-none placeholder:text-dionysus-text-secondary/70"
+            className="max-h-32 min-h-11 h-full w-full resize-none bg-transparent py-2 pr-10 text-sm text-dionysus-text-primary outline-none placeholder:text-dionysus-text-secondary/70"
           />
         </div>
 
