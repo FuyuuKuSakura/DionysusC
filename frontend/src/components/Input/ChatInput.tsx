@@ -157,7 +157,7 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
   const historyMessages = messages.slice(-historyLimit)
 
   return (
-    <div className="relative flex flex-col border border-transparent bg-dionysus-background/10 px-3 py-8 backdrop-blur-xl">
+    <div className="relative mb-8 flex flex-col border border-transparent bg-dionysus-background/10 px-3 py-16 backdrop-blur-xl">
         {/* Top toolbar */}
         <div className="absolute left-3 right-3 top-0.5 flex items-center justify-between">
           <div className="flex items-center gap-1">
@@ -231,7 +231,7 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
         )}
 
         {/* Textarea */}
-        <div className="absolute inset-x-3 top-8 bottom-8">
+        <div className="absolute inset-x-3 top-16 bottom-16">
           <textarea
             ref={textareaRef}
             value={text}
