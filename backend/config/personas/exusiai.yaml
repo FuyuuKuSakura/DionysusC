@@ -136,6 +136,7 @@ companion:
     idle: bored
     long_workflow: bored
   live2d:
+    model_path: "/exusiai_live2d/00.model3.json"
     default_expression: "原皮"
     expressions:
       happy: "爱心眼"

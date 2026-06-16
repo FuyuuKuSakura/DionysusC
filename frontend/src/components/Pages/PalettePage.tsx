@@ -39,13 +39,42 @@ export default function PalettePage() {
     setWallpaperInput(wallpaperUrl)
   }, [wallpaperUrl])
 
+  useEffect(() => {
+    // Restore wallpaper from the server if one has been persisted.
+    fetch('/api/wallpaper')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (data?.url) {
+          setWallpaperUrl(data.url)
+        }
+      })
+      .catch(() => {
+        // Keep local value if server has no wallpaper.
+      })
+  }, [setWallpaperUrl])
+
   const handleLive2dChange = (enabled: boolean) => {
     setLive2dEnabled(enabled)
     setTrackingEnabled(enabled)
   }
 
-  const handleWallpaperFile = (file: File | null) => {
+  const handleWallpaperFile = async (file: File | null) => {
     if (!file) return
+    const form = new FormData()
+    form.append('file', file)
+    try {
+      const res = await fetch('/api/wallpaper', {
+        method: 'POST',
+        body: form,
+      })
+      const data = await res.json()
+      if (res.ok && data.url) {
+        setWallpaperUrl(data.url)
+        return
+      }
+    } catch {
+      // Fall back to local base64 preview if server upload fails.
+    }
     const reader = new FileReader()
     reader.onload = () => {
       const result = reader.result

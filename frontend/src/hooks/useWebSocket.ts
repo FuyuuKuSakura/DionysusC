@@ -7,6 +7,26 @@ export interface UseWebSocketResult {
   reconnect: () => void
 }
 
+const CHAT_STORAGE_KEY = 'dionysus-cache-chat'
+
+function getPersistedSessionId(): string | null {
+  try {
+    const raw = localStorage.getItem(CHAT_STORAGE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    return parsed?.state?.currentSessionId ?? null
+  } catch {
+    return null
+  }
+}
+
+function buildWebSocketUrl(baseUrl: string): string {
+  const sessionId = getPersistedSessionId()
+  if (!sessionId) return baseUrl
+  const separator = baseUrl.includes('?') ? '&' : '?'
+  return `${baseUrl}${separator}session_id=${encodeURIComponent(sessionId)}`
+}
+
 export function useWebSocket(url: string, callbacks?: DionysusWebSocketClientCallbacks): UseWebSocketResult {
   const clientRef = useRef<DionysusWebSocketClient | null>(null)
   const callbacksRef = useRef(callbacks)
@@ -17,7 +37,8 @@ export function useWebSocket(url: string, callbacks?: DionysusWebSocketClientCal
   }, [callbacks])
 
   useEffect(() => {
-    const client = new DionysusWebSocketClient(url, {
+    const fullUrl = buildWebSocketUrl(url)
+    const client = new DionysusWebSocketClient(fullUrl, {
       onOpen: (event) => {
         setConnected(true)
         callbacksRef.current?.onOpen?.(event)

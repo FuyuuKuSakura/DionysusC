@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 import json
+import shutil
 import subprocess
 from pathlib import Path
 from typing import Any
@@ -205,6 +206,80 @@ def create_app() -> FastAPI:
             content={"ok": True, "path": str(target), "size": len(content)}
         )
 
+    _personas_live2d_dir = get_config_dir() / "personas" / "live2d"
+    _personas_live2d_dir.mkdir(parents=True, exist_ok=True)
+
+    @app.post("/api/personas/{persona_id}/live2d")
+    async def upload_persona_live2d(
+        persona_id: str, files: list[UploadFile] = File(...)
+    ) -> JSONResponse:
+        """Upload a Live2D model folder for a persona and update its YAML config."""
+        if not files:
+            return JSONResponse(
+                status_code=400, content={"error": "no_files_uploaded"}
+            )
+
+        target_dir = _personas_live2d_dir / persona_id
+        if target_dir.exists():
+            shutil.rmtree(target_dir)
+        target_dir.mkdir(parents=True, exist_ok=True)
+
+        entry_file: str | None = None
+        total_size = 0
+        for upload in files:
+            if not upload.filename:
+                continue
+            # Skip macOS metadata files.
+            if ".DS_Store" in upload.filename:
+                await upload.read()
+                continue
+            rel_path = Path(upload.filename)
+            # Strip the top-level directory name if the browser included it.
+            if len(rel_path.parts) > 1:
+                rel_path = Path(*rel_path.parts[1:])
+            dest = target_dir / rel_path
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            content = await upload.read()
+            total_size += len(content)
+            dest.write_bytes(content)
+            if entry_file is None and str(rel_path).lower().endswith(".model3.json"):
+                entry_file = str(rel_path).replace("\\", "/")
+
+        if entry_file is None:
+            return JSONResponse(
+                status_code=400,
+                content={"error": "no_model3_json_found"},
+            )
+
+        # Update the persona YAML with the new model path.
+        persona_path = get_config_dir() / "personas" / f"{persona_id}.yaml"
+        if persona_path.exists():
+            try:
+                yaml_text = persona_path.read_text(encoding="utf-8")
+                parsed = yaml.safe_load(yaml_text) or {}
+                companion = parsed.setdefault("companion", {})
+                live2d_cfg = companion.setdefault("live2d", {})
+                live2d_cfg["model_path"] = f"/personas/live2d/{persona_id}/{entry_file}"
+                persona_path.write_text(
+                    yaml.dump(parsed, allow_unicode=True, sort_keys=False),
+                    encoding="utf-8",
+                )
+            except Exception as exc:
+                logger.warning("update_persona_live2d_failed", error=str(exc))
+                return JSONResponse(
+                    status_code=500,
+                    content={"error": "update_persona_failed", "detail": str(exc)},
+                )
+
+        return JSONResponse(
+            content={
+                "ok": True,
+                "model_path": f"/personas/live2d/{persona_id}/{entry_file}",
+                "files_saved": len(files),
+                "total_size": total_size,
+            }
+        )
+
     @app.get("/api/settings/agent")
     async def get_agent_settings() -> JSONResponse:
         """Return current agent adapter configuration."""
@@ -378,12 +453,61 @@ def create_app() -> FastAPI:
                 status_code=500,
             )
 
+    _wallpaper_dir = Path(__file__).parent.parent / "data" / "wallpapers"
+    _wallpaper_dir.mkdir(parents=True, exist_ok=True)
+
+    @app.post("/api/wallpaper")
+    async def upload_wallpaper(file: UploadFile = File(...)) -> JSONResponse:
+        """Upload a wallpaper image, replacing any existing one."""
+        if not file.filename:
+            return JSONResponse(
+                status_code=400, content={"error": "missing_filename"}
+            )
+        ext = Path(file.filename).suffix.lower()
+        if ext not in {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp"}:
+            return JSONResponse(
+                status_code=400, content={"error": "unsupported_image_format"}
+            )
+        try:
+            # Remove old wallpapers so the directory always contains exactly one.
+            for old in _wallpaper_dir.iterdir():
+                if old.is_file():
+                    old.unlink()
+            target = _wallpaper_dir / f"wallpaper{ext}"
+            content = await file.read()
+            target.write_bytes(content)
+            return JSONResponse(
+                content={"ok": True, "url": f"/wallpapers/{target.name}"}
+            )
+        except Exception as exc:
+            logger.warning("upload_wallpaper_failed", error=str(exc))
+            return JSONResponse(
+                status_code=500, content={"error": "save_failed", "detail": str(exc)}
+            )
+
+    @app.get("/api/wallpaper")
+    async def get_wallpaper() -> JSONResponse:
+        """Return the URL of the currently saved wallpaper, if any."""
+        try:
+            for entry in _wallpaper_dir.iterdir():
+                if entry.is_file():
+                    return JSONResponse(content={"url": f"/wallpapers/{entry.name}"})
+        except Exception as exc:
+            logger.warning("get_wallpaper_failed", error=str(exc))
+        return JSONResponse(status_code=404, content={"url": None})
+
     # Mount static files last so API/WebSocket routes take precedence.
     static_dir = Path(config.server.static_dir)
     if not static_dir.is_absolute():
         project_root = Path(__file__).parent.parent
         static_dir = project_root / static_dir
     static_dir.mkdir(parents=True, exist_ok=True)
+    app.mount("/wallpapers", StaticFiles(directory=_wallpaper_dir), name="wallpapers")
+    app.mount(
+        "/personas/live2d",
+        StaticFiles(directory=_personas_live2d_dir),
+        name="personas_live2d",
+    )
     app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
 
     return app

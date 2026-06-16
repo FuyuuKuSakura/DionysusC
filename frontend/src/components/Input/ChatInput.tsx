@@ -17,6 +17,7 @@ type ParsedCommand =
         | 'change_working_dir'
         | 'list_kimi_sessions'
         | 'switch_kimi_session'
+        | 'resume_agent_session'
         | 'switch_adapter'
       args: string
     }
@@ -44,7 +45,7 @@ function parseSlashCommand(text: string): ParsedCommand | null {
   }
   const switchMatch = trimmed.match(/^\/switch\s+(\S+)$/i)
   if (switchMatch) {
-    return { type: 'client_command', command: 'switch_kimi_session', args: switchMatch[1] }
+    return { type: 'client_command', command: 'resume_agent_session', args: switchMatch[1] }
   }
   const adapterMatch = trimmed.match(/^\/adapter\s+(\S+)$/i)
   if (adapterMatch) {
@@ -132,10 +133,13 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
   }
 
   const handleSessionsClick = () => {
-    sendMessage({
-      type: 'client_command',
-      payload: { command: 'list_kimi_sessions' },
-    })
+    const target = window.prompt('输入要恢复的 Agent session ID：')
+    if (target?.trim()) {
+      sendMessage({
+        type: 'client_command',
+        payload: { command: 'resume_agent_session', args: target.trim() },
+      })
+    }
   }
 
   const iconButtonClass =
@@ -179,7 +183,7 @@ export default function ChatInput({ sendMessage }: ChatInputProps) {
               type="button"
               onClick={handleSessionsClick}
               className={iconButtonClass}
-              title="Sessions"
+              title="恢复 Agent Session"
             >
               <List className="h-4 w-4" />
             </button>

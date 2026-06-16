@@ -499,9 +499,9 @@ class SessionManager:
                 yield msg
             return
 
-        if command == "switch_kimi_session":
+        if command == "switch_kimi_session" or command == "resume_agent_session":
             target = args or text
-            async for msg in self._cmd_switch_kimi_session(session_id, target):
+            async for msg in self._cmd_resume_agent_session(session_id, target):
                 yield msg
             return
 
@@ -638,14 +638,14 @@ class SessionManager:
             ),
         )
 
-    async def _cmd_switch_kimi_session(
+    async def _cmd_resume_agent_session(
         self, session_id: str, target: str | None
     ) -> AsyncIterator[ServerMessage]:
         if not target:
             yield SystemNoticeMessage(
                 session_id=session_id,
                 payload=SystemNoticePayload(
-                    text="请提供会话 ID，例如 /switch ses_xxx",
+                    text="请提供 Agent session ID，例如 /switch ses_xxx",
                     level="warning",
                 ),
             )
@@ -657,14 +657,15 @@ class SessionManager:
             yield SystemNoticeMessage(
                 session_id=session_id,
                 payload=SystemNoticePayload(
-                    text=f"已切换到 Kimi CLI 会话：{target}", level="info"
+                    text=f"已恢复到 Agent session：`{target}`。后续发送的消息将在该 session 中继续。",
+                    level="info",
                 ),
             )
         else:
             yield SystemNoticeMessage(
                 session_id=session_id,
                 payload=SystemNoticePayload(
-                    text="当前 Agent 适配器不支持切换会话。",
+                    text="当前 Agent 适配器不支持恢复会话。",
                     level="warning",
                 ),
             )

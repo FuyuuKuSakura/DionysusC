@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { User, Save, Upload, Check } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { User, Save, Upload, Check, FolderOpen } from 'lucide-react'
 
 interface PersonaInfo {
   id: string
@@ -19,6 +19,8 @@ export default function PersonaPage({ onCloseGuardChange }: PersonaPageProps) {
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
   const [corpusFile, setCorpusFile] = useState<File | null>(null)
+  const [live2dFiles, setLive2dFiles] = useState<File[]>([])
+  const live2dInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     fetch('/api/personas')
@@ -65,7 +67,16 @@ export default function PersonaPage({ onCloseGuardChange }: PersonaPageProps) {
     setSelectedPersona(id)
     setMessage(null)
     setCorpusFile(null)
+    setLive2dFiles([])
   }
+
+  useEffect(() => {
+    const input = live2dInputRef.current
+    if (input) {
+      input.setAttribute('webkitdirectory', 'true')
+      input.setAttribute('directory', 'true')
+    }
+  }, [])
 
   const savePersona = async () => {
     setSaving(true)
@@ -104,6 +115,45 @@ export default function PersonaPage({ onCloseGuardChange }: PersonaPageProps) {
       setMessage(res.ok ? '语料上传成功' : `上传失败：${data.error || '未知错误'}`)
     } catch {
       setMessage('上传失败')
+    }
+  }
+
+  const handleLive2dFolderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    if (files.length === 0) return
+    setLive2dFiles(files)
+  }
+
+  const uploadLive2dModel = async () => {
+    if (live2dFiles.length === 0 || !selectedPersona) return
+    const form = new FormData()
+    live2dFiles.forEach((file) => {
+      const relativePath = (file as File & { webkitRelativePath?: string }).webkitRelativePath || file.name
+      form.append('files', file, relativePath)
+    })
+    setSaving(true)
+    setMessage(null)
+    try {
+      const res = await fetch(`/api/personas/${selectedPersona}/live2d`, {
+        method: 'POST',
+        body: form,
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setLive2dFiles([])
+        setMessage(`Live2D 模型已更新：${data.model_path}`)
+        // Reload YAML so the user sees the updated model_path.
+        const yamlRes = await fetch(`/api/personas/${selectedPersona}`)
+        const yamlData = await yamlRes.json()
+        setPersonaYaml(yamlData.yaml || '')
+        setLoadedYaml(yamlData.yaml || '')
+      } else {
+        setMessage(`Live2D 上传失败：${data.error || '未知错误'}`)
+      }
+    } catch {
+      setMessage('Live2D 上传失败')
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -189,6 +239,41 @@ export default function PersonaPage({ onCloseGuardChange }: PersonaPageProps) {
             上传
           </button>
         </div>
+      </section>
+
+      <section>
+        <div className="mb-3 flex items-center gap-2 text-sm font-medium text-dionysus-text-primary">
+          <FolderOpen className="h-4 w-4 text-dionysus-primary" />
+          Live2D 模型
+        </div>
+        <div className="flex items-center gap-2">
+          <label className="flex cursor-pointer items-center gap-1.5 rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-1.5 text-xs font-bold text-dionysus-text-primary transition-all hover:border-dionysus-primary/50">
+            <Upload className="h-3.5 w-3.5" />
+            选择模型文件夹
+            <input
+              ref={live2dInputRef}
+              type="file"
+              onChange={handleLive2dFolderChange}
+              className="sr-only"
+            />
+          </label>
+          {live2dFiles.length > 0 && (
+            <span className="max-w-[12rem] truncate text-xs text-dionysus-text-secondary">
+              {live2dFiles.length} 个文件
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={uploadLive2dModel}
+            disabled={live2dFiles.length === 0 || saving}
+            className="rounded-xl border-2 border-black/20 bg-dionysus-primary px-3 py-1.5 text-xs font-bold text-white shadow-md transition-all hover:brightness-110 disabled:opacity-50"
+          >
+            上传并应用
+          </button>
+        </div>
+        <p className="mt-2 text-xs text-dionysus-text-secondary">
+          请选择包含 .model3.json 入口文件的 Live2D 模型文件夹。
+        </p>
       </section>
     </div>
   )

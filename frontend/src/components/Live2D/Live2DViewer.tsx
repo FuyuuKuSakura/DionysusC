@@ -12,7 +12,7 @@ interface Live2DViewerProps {
   className?: string
 }
 
-const MODEL_URL = '/exusiai_live2d/00.model3.json'
+const DEFAULT_MODEL_URL = '/exusiai_live2d/00.model3.json'
 const PLACEHOLDER_URL = '/exusiai_idle.webm'
 const DEFAULT_EXPRESSION = '原皮'
 const IDLE_MOTION_GROUP = 'Idle'
@@ -54,6 +54,27 @@ export default function Live2DViewer({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [retryKey, setRetryKey] = useState(0)
+  const [modelUrl, setModelUrl] = useState(DEFAULT_MODEL_URL)
+
+  const currentSessionId = useChatStore((state) => state.currentSessionId)
+  const personaId =
+    useChatStore((state) =>
+      state.sessions.find((s) => s.id === currentSessionId)?.persona_id,
+    ) ?? 'exusiai'
+
+  useEffect(() => {
+    fetch(`/api/personas/${personaId}/companion`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        const path = data?.model_path
+        if (path) {
+          setModelUrl(path)
+        }
+      })
+      .catch(() => {
+        // Keep default model URL on error.
+      })
+  }, [personaId])
 
   const {
     trackingEnabled,
@@ -130,7 +151,7 @@ export default function Live2DViewer({
         ;(window as unknown as Record<string, unknown>).__live2dApp = app
         ;(window as unknown as Record<string, unknown>).__live2dModel = null
 
-        const model = (await Live2DModel.from(MODEL_URL, {
+        const model = (await Live2DModel.from(modelUrl, {
           autoInteract: false,
           autoUpdate: true,
         })) as Live2DModel
@@ -247,7 +268,7 @@ export default function Live2DViewer({
       modelRef.current = null
       appRef.current = null
     }
-  }, [retryKey, enabled])
+  }, [retryKey, enabled, modelUrl])
 
   // Drive model parameters from mouse tracking output.
   useEffect(() => {
