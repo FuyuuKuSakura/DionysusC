@@ -192,6 +192,56 @@ def create_app() -> FastAPI:
         """List all persona configuration files."""
         return JSONResponse(content=list_personas())
 
+    def _build_default_persona_yaml(persona_id: str, name: str, description: str) -> str:
+        """Build a minimal but complete default persona YAML."""
+        data = {
+            "id": persona_id,
+            "name": name,
+            "description": description,
+            "system_prompt": f"你是{name}。\n\n称呼：你称用户为\"用户\"。自称用\"我\"。\n\n回复风格：\n- 用自然、口语化的中文回复。\n- 不要解释设定，直接以{name}的身份回答。\n",
+            "companion": {
+                "live2d": {
+                    "model_path": "",
+                    "default_expression": "原皮",
+                    "expressions": {
+                        "happy": "微笑",
+                        "worried": "叹气",
+                        "surprised": "惊讶",
+                        "annoyed": "烦躁",
+                        "confident": "冷静",
+                        "bored": "原皮",
+                        "neutral": "原皮",
+                    },
+                    "motions": {
+                        "idle": "Idle",
+                        "greet": "Idle",
+                        "nod": "Idle",
+                    },
+                },
+                "touch_zones": {
+                    "head": {
+                        "expression": "惊讶",
+                        "lines": ["嗯？", "怎么啦？"],
+                    },
+                    "body": {
+                        "expression": "烦躁",
+                        "lines": ["请轻一点。", "这样有点痒。"],
+                    },
+                },
+                "status_to_emotion": {
+                    "thinking": "neutral",
+                    "reading_file": "neutral",
+                    "executing": "confident",
+                    "outputting": "calm",
+                    "success": "calm",
+                    "error": "worried",
+                    "idle": "bored",
+                    "long_workflow": "bored",
+                },
+            },
+        }
+        return yaml.dump(data, allow_unicode=True, sort_keys=False)
+
     @app.post("/api/personas")
     async def create_persona(request: Request) -> JSONResponse:
         """Create a new persona from a YAML payload."""
@@ -226,6 +276,38 @@ def create_app() -> FastAPI:
                 status_code=409,
                 content={"error": "persona_already_exists"},
             )
+        persona_path = _ensure_runtime_persona_yaml(persona_id)
+        persona_path.write_text(yaml_text, encoding="utf-8")
+        return JSONResponse(content={"ok": True, "id": persona_id, "name": persona_name})
+
+    @app.post("/api/personas/create")
+    async def create_persona_from_json(request: Request) -> JSONResponse:
+        """Create a new persona from a simple JSON form (id, name, description)."""
+        try:
+            body = await request.json()
+        except Exception as exc:
+            return JSONResponse(
+                status_code=400, content={"error": "invalid_json", "detail": str(exc)}
+            )
+        persona_id = str(body.get("id", "")).strip()
+        persona_name = str(body.get("name", "")).strip()
+        description = str(body.get("description", "")).strip()
+        if not persona_id or not persona_name:
+            return JSONResponse(
+                status_code=400,
+                content={"error": "missing_id_or_name"},
+            )
+        if not persona_id.replace("_", "").isalnum():
+            return JSONResponse(
+                status_code=400,
+                content={"error": "invalid_id", "detail": "id 只能包含字母、数字和下划线"},
+            )
+        if persona_exists(persona_id):
+            return JSONResponse(
+                status_code=409,
+                content={"error": "persona_already_exists"},
+            )
+        yaml_text = _build_default_persona_yaml(persona_id, persona_name, description)
         persona_path = _ensure_runtime_persona_yaml(persona_id)
         persona_path.write_text(yaml_text, encoding="utf-8")
         return JSONResponse(content={"ok": True, "id": persona_id, "name": persona_name})

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Bot, Save, History, Trash2 } from 'lucide-react'
 import { useSettingsStore } from '@/stores/settingsStore'
+import ccswitchIcon from '/ccswitch_icon.png'
 
 interface AgentConfig {
   default: string
@@ -286,7 +287,7 @@ export default function SystemSettingsPage() {
           }}
           className="flex w-full items-center justify-center gap-1.5 rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-xs font-bold text-dionysus-text-secondary transition-colors hover:border-dionysus-primary/50 hover:text-dionysus-primary"
         >
-          <img src="/ccswitch_icon.png" alt="CC Switch" className="h-5 w-5 rounded-md object-cover" />
+          <img src={ccswitchIcon} alt="CC Switch" className="h-5 w-5 rounded-md object-cover" />
           打开 CC Switch
         </button>
       </section>

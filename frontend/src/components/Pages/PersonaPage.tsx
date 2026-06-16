@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
-import { User, Save, Upload, Check, FolderOpen, Plus, Unlink, RefreshCcw, Bot } from 'lucide-react'
+import { User, Save, Upload, Check, FolderOpen, Plus, Unlink, RefreshCcw, Bot, X } from 'lucide-react'
 import { useChatStore } from '@/stores/chatStore'
 import { useLive2DStore } from '@/stores/live2dStore'
+import DionysusSelect from '@/components/UI/DionysusSelect'
 
 type SupervisorMode = 'disabled' | 'agent_session' | 'deepseek_api'
 
@@ -45,10 +46,14 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
   const [live2dFiles, setLive2dFiles] = useState<File[]>([])
   const [live2dPath, setLive2dPath] = useState<string | null>(null)
   const live2dInputRef = useRef<HTMLInputElement>(null)
-  const yamlInputRef = useRef<HTMLInputElement>(null)
 
   const [supervisor, setSupervisor] = useState<SupervisorSettings>(DEFAULT_SUPERVISOR)
   const [loadedSupervisor, setLoadedSupervisor] = useState<SupervisorSettings>(DEFAULT_SUPERVISOR)
+  const [adapters, setAdapters] = useState<Record<string, { enabled?: boolean }>>({})
+
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [newPersona, setNewPersona] = useState({ id: '', name: '', description: '' })
+  const [addError, setAddError] = useState<string | null>(null)
 
   const sessions = useChatStore((state) => state.sessions)
   const currentSessionId = useChatStore((state) => state.currentSessionId)
@@ -93,6 +98,13 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
         setSupervisor(DEFAULT_SUPERVISOR)
         setLoadedSupervisor(DEFAULT_SUPERVISOR)
       })
+
+    fetch('/api/adapters')
+      .then((r) => r.json())
+      .then((data) => {
+        setAdapters(data || {})
+      })
+      .catch(() => setAdapters({}))
   }, [])
 
   useEffect(() => {
@@ -159,30 +171,36 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
     maybeSwitchPersona(id)
   }
 
-  const handleAddPersona = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+  const handleAddPersona = async () => {
+    setAddError(null)
+    const id = newPersona.id.trim()
+    const name = newPersona.name.trim()
+    if (!id || !name) {
+      setAddError('ID 和名称不能为空')
+      return
+    }
     try {
-      const yaml = await file.text()
-      const res = await fetch('/api/personas', {
+      const res = await fetch('/api/personas/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ yaml }),
+        body: JSON.stringify({
+          id,
+          name,
+          description: newPersona.description.trim(),
+        }),
       })
       const data = await res.json()
       if (res.ok && data.id) {
+        setNewPersona({ id: '', name: '', description: '' })
+        setShowAddModal(false)
         await refreshPersonas(data.id)
         setMessage('角色添加成功')
         maybeSwitchPersona(data.id)
       } else {
-        setMessage(`添加失败：${data.error || '未知错误'}`)
+        setAddError(`添加失败：${data.error || '未知错误'}`)
       }
     } catch {
-      setMessage('添加失败')
-    } finally {
-      if (yamlInputRef.current) {
-        yamlInputRef.current.value = ''
-      }
+      setAddError('添加失败')
     }
   }
 
@@ -233,12 +251,12 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
 
   const uploadCorpus = async () => {
     if (!corpusFile || !selectedPersona) return
-    const form = new FormData()
-    form.append('file', corpusFile)
     try {
+      const text = await corpusFile.text()
       const res = await fetch(`/api/personas/${selectedPersona}/corpus`, {
         method: 'POST',
-        body: form,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
       })
       const data = await res.json()
       if (res.ok) {
@@ -360,28 +378,25 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
           当前角色
         </div>
         <div className="flex items-center gap-2">
-          <select
+          <DionysusSelect
             value={selectedPersona}
-            onChange={(e) => handlePersonaChange(e.target.value)}
-            className="min-w-0 flex-1 rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-sm text-dionysus-text-primary outline-none focus:border-dionysus-primary"
+            options={personas.map((p) => ({ value: p.id, label: p.name || p.id }))}
+            onChange={(value) => handlePersonaChange(value)}
+            placeholder="选择角色"
+            className="min-w-0 flex-1"
+          />
+          <button
+            type="button"
+            onClick={() => {
+              setAddError(null)
+              setNewPersona({ id: '', name: '', description: '' })
+              setShowAddModal(true)
+            }}
+            className="flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-xl border-2 border-black/20 bg-dionysus-primary px-3 py-2 text-xs font-bold text-white shadow-md transition-all hover:brightness-110"
           >
-            {personas.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.name || p.id}
-              </option>
-            ))}
-          </select>
-          <label className="flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-xl border-2 border-black/20 bg-dionysus-primary px-3 py-2 text-xs font-bold text-white shadow-md transition-all hover:brightness-110">
             <Plus className="h-3.5 w-3.5" />
             添加角色
-            <input
-              ref={yamlInputRef}
-              type="file"
-              accept=".yaml,.yml"
-              onChange={handleAddPersona}
-              className="sr-only"
-            />
-          </label>
+          </button>
         </div>
         {selectedDescription && (
           <p className="mt-2 text-xs text-dionysus-text-secondary">{selectedDescription}</p>
@@ -546,12 +561,13 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
           {supervisor.mode === 'agent_session' && (
             <div>
               <label className="mb-1.5 block text-xs text-dionysus-text-secondary">Adapter ID</label>
-              <input
-                type="text"
+              <DionysusSelect
                 value={supervisor.adapter_id}
-                onChange={(e) => setSupervisor((s) => ({ ...s, adapter_id: e.target.value }))}
-                className="w-full rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-sm text-dionysus-text-primary outline-none focus:border-dionysus-primary"
-                placeholder="例如 kimi_cli"
+                options={Object.entries(adapters)
+                  .filter(([, cfg]) => cfg.enabled !== false)
+                  .map(([id]) => ({ value: id, label: id }))}
+                onChange={(value) => setSupervisor((s) => ({ ...s, adapter_id: value }))}
+                placeholder="选择 Agent Adapter"
               />
             </div>
           )}
@@ -616,6 +632,75 @@ export default function PersonaPage({ onCloseGuardChange, sendMessage }: Persona
           </button>
         </div>
       </section>
+
+      {showAddModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-2xl border-2 border-dionysus-subtle-border bg-dionysus-panel-bg p-6 shadow-xl">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-dionysus-text-primary">添加角色</h3>
+              <button
+                type="button"
+                onClick={() => setShowAddModal(false)}
+                className="rounded-lg p-1 text-dionysus-text-secondary hover:bg-dionysus-glass-highlight"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="mb-1.5 block text-xs text-dionysus-text-secondary">角色 ID（英文/数字/下划线）</label>
+                <input
+                  type="text"
+                  value={newPersona.id}
+                  onChange={(e) => setNewPersona((p) => ({ ...p, id: e.target.value }))}
+                  className="w-full rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-sm text-dionysus-text-primary outline-none focus:border-dionysus-primary"
+                  placeholder="例如 my_character"
+                />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-xs text-dionysus-text-secondary">角色名称</label>
+                <input
+                  type="text"
+                  value={newPersona.name}
+                  onChange={(e) => setNewPersona((p) => ({ ...p, name: e.target.value }))}
+                  className="w-full rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-sm text-dionysus-text-primary outline-none focus:border-dionysus-primary"
+                  placeholder="例如 我的角色"
+                />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-xs text-dionysus-text-secondary">简介</label>
+                <input
+                  type="text"
+                  value={newPersona.description}
+                  onChange={(e) => setNewPersona((p) => ({ ...p, description: e.target.value }))}
+                  className="w-full rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-sm text-dionysus-text-primary outline-none focus:border-dionysus-primary"
+                  placeholder="一句话描述角色"
+                />
+              </div>
+              {addError && (
+                <p className="text-xs text-dionysus-danger">{addError}</p>
+              )}
+              <div className="flex gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="flex-1 rounded-xl border-2 border-dionysus-subtle-border bg-dionysus-glass-highlight px-3 py-2 text-xs font-bold text-dionysus-text-secondary transition-all hover:border-dionysus-primary/50 hover:text-dionysus-primary"
+                >
+                  取消
+                </button>
+                <button
+                  type="button"
+                  onClick={handleAddPersona}
+                  disabled={!newPersona.id.trim() || !newPersona.name.trim()}
+                  className="flex-1 rounded-xl border-2 border-black/20 bg-dionysus-primary px-3 py-2 text-xs font-bold text-white shadow-md transition-all hover:brightness-110 disabled:opacity-50"
+                >
+                  创建
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
