@@ -94,7 +94,6 @@ class JSONStreamStrategy(CLIAdapterStrategy):
         line: str,
         session_holder: dict[str, str | None],
     ) -> list[AgentEvent]:
-        import json
 
         events: list[AgentEvent] = []
         objects, remaining = _extract_json_objects(line)

@@ -1,4 +1,4 @@
-import { create } from 'zustand'
+import { create, type StateCreator } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { parseToolCalls } from '@/lib/tools'
 import type {
@@ -48,6 +48,8 @@ interface ChatState {
   addUserMessage: (text: string, attachments?: unknown[]) => ChatMessage
   addAgentChunk: (chunk: string) => void
   addAgentChunkToSession: (sessionId: string, chunk: string) => void
+  addThinkingChunk: (chunk: string) => void
+  addThinkingChunkToSession: (sessionId: string, chunk: string) => void
   finalizeAgentMessage: (status?: 'complete' | 'interrupted' | 'error') => void
   finalizeAgentMessageInSession: (sessionId: string, status?: 'complete' | 'interrupted' | 'error') => void
   setOptions: (options: OptionItem[], uiType?: OptionsUiType) => void
@@ -73,26 +75,26 @@ interface ChatState {
   clearToolCalls: () => void
 }
 
-export const useChatStore = create<ChatState>()(
-  persist(
-    (set, get) => ({
-      sessions: [],
-      currentSessionId: null,
-      messages: [],
-      isStreaming: false,
-      currentOptions: null,
-      currentOptionsUiType: null,
-      optionDisabled: false,
-      streamingStatus: null,
-      toolCalls: [],
-      activeToolCallId: null,
-      companionLine: null,
-      companionHistory: [],
-      sessionCompanion: {},
-      todos: [],
-      sessionTodos: {},
+const isTest = typeof process !== 'undefined' && process.env?.VITEST === 'true'
 
-      addSession: (session) => {
+const storeDefinition: StateCreator<ChatState> = (set, get) => ({
+  sessions: [],
+  currentSessionId: null,
+  messages: [],
+  isStreaming: false,
+  currentOptions: null,
+  currentOptionsUiType: null,
+  optionDisabled: false,
+  streamingStatus: null,
+  toolCalls: [],
+  activeToolCallId: null,
+  companionLine: null,
+  companionHistory: [],
+  sessionCompanion: {},
+  todos: [],
+  sessionTodos: {},
+
+  addSession: (session) => {
     const now = Date.now()
     const newSession: Session = {
       id: generateId(),
@@ -318,6 +320,76 @@ export const useChatStore = create<ChatState>()(
         state.currentSessionId === sessionId
           ? nextMessages
           : state.messages
+      return { sessions, messages }
+    })
+  },
+
+  addThinkingChunk: (chunk) => {
+    const sessionId = get().currentSessionId
+    if (!sessionId) return
+
+    set((state) => {
+      const lastMessage = state.messages[state.messages.length - 1]
+      let messages: ChatMessage[]
+      if (lastMessage && lastMessage.role === 'agent' && lastMessage.status === 'streaming') {
+        messages = state.messages.map((m, idx) =>
+          idx === state.messages.length - 1
+            ? { ...m, thinking: (m.thinking ?? '') + chunk }
+            : m,
+        )
+      } else {
+        const newMessage: ChatMessage = {
+          id: generateId(),
+          role: 'agent',
+          content: '',
+          thinking: chunk,
+          timestamp: Date.now(),
+          trace_id: generateId(),
+          status: 'streaming',
+        }
+        messages = [...state.messages, newMessage]
+      }
+
+      const sessions = state.sessions.map((s) =>
+        s.id === sessionId ? { ...s, updated_at: Date.now(), messages } : s,
+      )
+
+      return { sessions, messages }
+    })
+  },
+
+  addThinkingChunkToSession: (sessionId, chunk) => {
+    if (!sessionId) return
+    set((state) => {
+      const session = state.sessions.find((s) => s.id === sessionId)
+      if (!session) return state
+
+      const msgs = session.messages
+      const lastMessage = msgs[msgs.length - 1]
+      let nextMessages: ChatMessage[]
+      if (lastMessage && lastMessage.role === 'agent' && lastMessage.status === 'streaming') {
+        nextMessages = msgs.map((m, idx) =>
+          idx === msgs.length - 1 ? { ...m, thinking: (m.thinking ?? '') + chunk } : m,
+        )
+      } else {
+        const newMessage: ChatMessage = {
+          id: generateId(),
+          role: 'agent',
+          content: '',
+          thinking: chunk,
+          timestamp: Date.now(),
+          trace_id: generateId(),
+          status: 'streaming',
+        }
+        nextMessages = [...msgs, newMessage]
+      }
+
+      const sessions = state.sessions.map((s) =>
+        s.id === sessionId ? { ...s, updated_at: Date.now(), messages: nextMessages } : s,
+      )
+
+      const messages =
+        state.currentSessionId === sessionId ? nextMessages : state.messages
       return { sessions, messages }
     })
   },
@@ -678,21 +750,24 @@ export const useChatStore = create<ChatState>()(
   clearToolCalls: () => {
     set({ toolCalls: [], activeToolCallId: null })
   },
-    }),
-    {
-      name: 'dionysus-cache-chat',
-      partialize: (state) => ({
-        sessions: state.sessions,
-        currentSessionId: state.currentSessionId,
-      }),
-      onRehydrateStorage: () => (state) => {
-        if (!state) return
-        // Restore the active messages from the persisted current session.
-        const session = state.sessions.find((s) => s.id === state.currentSessionId)
-        if (session) {
-          state.messages = session.messages
-        }
-      },
-    },
-  ),
+})
+
+export const useChatStore = create<ChatState>()(
+  (isTest
+    ? storeDefinition
+    : persist(storeDefinition, {
+        name: 'dionysus-cache-chat',
+        partialize: (state) => ({
+          sessions: state.sessions,
+          currentSessionId: state.currentSessionId,
+        }),
+        onRehydrateStorage: () => (state) => {
+          if (!state) return
+          // Restore the active messages from the persisted current session.
+          const session = state.sessions.find((s) => s.id === state.currentSessionId)
+          if (session) {
+            state.messages = session.messages
+          }
+        },
+      })) as StateCreator<ChatState>,
 )

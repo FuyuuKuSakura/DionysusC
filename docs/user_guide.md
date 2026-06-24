@@ -1,14 +1,14 @@
 # Dionysus 用户手册
 
-> 版本：v0.1.0  
+> 版本：v0.2.0  
 > 作者：FuyuuKu樱  
-> 更新日期：2026-06-16
+> 更新日期：2026-06-24
 
 ---
 
 ## 1. 项目简介
 
-Dionysus 是一个带有角色陪伴（Companion）功能的 AI Agent 前端。它把聊天会话、Live2D 看板娘、后台角色播报和多个 CLI Agent（kimi / claude / codex / opencode）整合在一个界面里，让你在写代码、查资料的同时，有一个会动、会说的角色陪你。
+Dionysus 是一个带有角色陪伴（Companion）功能的 AI Agent 前端。它把聊天会话、Live2D 看板娘、后台角色播报和多个 CLI Agent（kimi / claude / codex / opencode / codebuddy）整合在一个界面里，让你在写代码、查资料的同时，有一个会动、会说的角色陪你。
 
 主要功能：
 
@@ -155,9 +155,10 @@ Supervisor 直接调用 DeepSeek API 生成播报内容。
    - `claude_cli`
    - `codex_cli`
    - `opencode_cli`
+   - `codebuddy_cli`
 3. 对每个适配器可配置：
    - **启用**：是否允许该适配器被使用。
-   - **命令路径**：本地 CLI 命令，例如 `kimi`、`claude`、`codex`、`opencode`。
+   - **命令路径**：本地 CLI 命令，例如 `kimi`、`claude`、`codex`、`opencode`、`codebuddy`。
    - **默认模型**：该适配器默认使用的模型名（如 `claude-sonnet-4-20250514`、`gpt-4o`）。
 4. 点击「保存并重启」使配置生效。
 
@@ -165,23 +166,34 @@ Supervisor 直接调用 DeepSeek API 生成播报内容。
 
 ---
 
-## 7. 系统设置
+## 7. 思考过程（Thinking）
 
-### 7.1 历史记录
+当使用 CodeBuddy CLI 时，Agent 的中间推理步骤会以可折叠的「思考过程」块显示在消息气泡内。
+
+- 默认折叠，避免聊天区被推理内容刷屏。
+- 点击「思考过程 · 展开」可查看完整推理。
+- 思考内容仅用于展示，不会影响最终发送给 Agent 的上下文。
+- 其他 CLI（Kimi / Claude / Codex / OpenCode）若未输出结构化推理内容，则不会显示该块。
+
+---
+
+## 8. 系统设置
+
+### 8.1 历史记录
 
 - **单会话保留消息数（1-500）**：控制每个会话在本地保存的最大消息数，默认 50。
 
-### 7.2 清除本地缓存
+### 8.2 清除本地缓存
 
 点击「清除本地缓存」可清理浏览器本地存储的临时数据，不会删除后端角色、语料或模型文件。
 
-### 7.3 打开 CC Switch
+### 8.3 打开 CC Switch
 
 点击「打开 CC Switch」可跳转或打开 CC Switch 相关扩展/页面。按钮左侧会显示图标。
 
 ---
 
-## 8. 主题与界面
+## 9. 主题与界面
 
 Dionysus 使用 Dionysus 设计系统：
 
@@ -193,7 +205,7 @@ Dionysus 使用 Dionysus 设计系统：
 
 ---
 
-## 9. 常见问题
+## 10. 常见问题
 
 ### Q1：角色下拉框为空或显示异常？
 
@@ -218,12 +230,12 @@ Dionysus 使用 Dionysus 设计系统：
 
 ### Q5：Agent 适配器命令找不到？
 
-- 在系统终端执行对应命令（如 `kimi`、`claude`）确认已安装。
+- 在系统终端执行对应命令（如 `kimi`、`claude`、`codebuddy`）确认已安装。
 - 在设置中填写完整路径（如 `/opt/homebrew/bin/kimi`）。
 
 ---
 
-## 10. 目录与文件速查
+## 11. 目录与文件速查
 
 | 路径 | 说明 |
 |------|------|

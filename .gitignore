@@ -46,6 +46,8 @@ backend/build/
 
  # Local runtime / test data
 test_workspace/
+workspace/*
+!workspace/.gitkeep
 logs/
 qa_reports/
 data/

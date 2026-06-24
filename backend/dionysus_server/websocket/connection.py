@@ -11,7 +11,6 @@ from fastapi import WebSocket, WebSocketDisconnect
 
 from dionysus_server.models import (
     ClientCommandMessage,
-    ClientCommandPayload,
     ClientMessage,
     HandshakeMessage,
     HandshakePayload,

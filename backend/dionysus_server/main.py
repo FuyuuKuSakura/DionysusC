@@ -143,7 +143,6 @@ def create_app() -> FastAPI:
     _load_agent_settings(config)
 
     app = FastAPI(title="Dionysus Server", version="0.2.0")
-    theme_dir = get_config_dir() / "themes"
 
     @app.get("/api/themes")
     async def get_themes() -> JSONResponse:
@@ -200,7 +199,13 @@ def create_app() -> FastAPI:
             "id": persona_id,
             "name": name,
             "description": description,
-            "system_prompt": f"你是{name}。\n\n称呼：你称用户为\"用户\"。自称用\"我\"。\n\n回复风格：\n- 用自然、口语化的中文回复。\n- 不要解释设定，直接以{name}的身份回答。\n",
+            "system_prompt": (
+                f"你是{name}。\n\n"
+                f"称呼：你称用户为\"用户\"。自称用\"我\"。\n\n"
+                "回复风格：\n"
+                "- 用自然、口语化的中文回复。\n"
+                f"- 不要解释设定，直接以{name}的身份回答。\n"
+            ),
             "companion": {
                 "live2d": {
                     "model_path": "",

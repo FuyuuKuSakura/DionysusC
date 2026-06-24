@@ -64,7 +64,13 @@ class Live2DSettings(BaseSettings):
 
 
 class SecuritySettings(BaseSettings):
-    allowed_hosts: list[str] = Field(default_factory=lambda: ["localhost", "127.0.0.1", "192.168.*.*"])
+    allowed_hosts: list[str] = Field(
+        default_factory=lambda: [
+            "localhost",
+            "127.0.0.1",
+            "192.168.*.*",
+        ]
+    )
     max_upload_size_mb: int = 10
     enable_ast_audit: bool = True
     enable_sensitive_filter: bool = True

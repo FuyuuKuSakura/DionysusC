@@ -74,8 +74,10 @@ def main() -> int:
     venv_python = backend_dir / ".venv" / "bin" / "python"
 
     env = os.environ.copy()
-    env["DIONYSUS_SERVER__HOST"] = args.host
-    env["DIONYSUS_SERVER__PORT"] = str(args.backend_port)
+    # pydantic-settings env_prefix is "Dionysus_"; keep the exact casing so
+    # the variables are recognised on case-sensitive systems.
+    env["Dionysus_server__host"] = args.host
+    env["Dionysus_server__port"] = str(args.backend_port)
 
     backend_cmd = [
         str(venv_python),
