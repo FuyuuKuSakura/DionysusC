@@ -39,7 +39,7 @@ Dionysus（代号“苹果派”）是一个带 **Live2D 角色陪伴** 的 Codi
 - 😊 **情绪引擎**：后端根据 Agent 执行状态（thinking / executing / success / error）自动映射角色情绪与 Live2D 表情/动作。
 - 💬 **角色台词气泡**：Agent 执行过程中，角色会在右侧实时说出台词，并显示对应情绪 emoji。
 - 🌐 **浏览器聊天界面**：React 18 + TypeScript + Tailwind CSS，支持响应式桌面/移动端。
-- 🔌 **多 Agent 兼容**：已接入 Kimi CLI、Claude CLI、OpenCode CLI、Codex CLI，可在会话设置中切换。
+- 🔌 **多 Agent 兼容**：已接入 Kimi CLI、Claude CLI、OpenCode CLI、Codex CLI、CodeBuddy CLI，可在会话设置中切换。
 - 🎨 **可更换配色方案**：主题完全由 `backend/config/themes/*.yaml` 驱动，切换无需重新编译。
 - ⚡ **实时流式反馈**：Agent 执行状态与回复在同一消息气泡内流式更新。
 - 🛑 **打断机制**：前端发送 `interrupt`，后端终止当前 CLI 进程。
@@ -54,7 +54,7 @@ Dionysus（代号“苹果派”）是一个带 **Live2D 角色陪伴** 的 Codi
 - **前端**：React 18, TypeScript, Vite, Tailwind CSS, Zustand, Framer Motion, react-markdown
 - **Live2D**：PixiJS, pixi-live2d-display, Live2D Cubism 4
 - **后端**：Python 3.10+, FastAPI, uvicorn, pydantic, aiosqlite, structlog
-- **CLI 桥接**：Kimi Code CLI、Claude Code CLI、OpenCode CLI、Codex CLI
+- **CLI 桥接**：Kimi Code CLI、Claude Code CLI、OpenCode CLI、Codex CLI、CodeBuddy CLI
 - **桌面打包**：Electron + electron-builder + PyInstaller
 
 ---
@@ -98,7 +98,7 @@ Dionysus（代号“苹果派”）是一个带 **Live2D 角色陪伴** 的 Codi
 
 - Python 3.10+
 - Node.js 18+（推荐 Node 20+）
-- 已安装并登录至少一个 Coding Agent CLI（如 [Kimi Code CLI](https://kimi.com/kimicode)）
+- 已安装并登录至少一个 Coding Agent CLI（如 [Kimi Code CLI](https://kimi.com/kimicode)、Claude Code CLI、OpenCode CLI、Codex CLI、CodeBuddy CLI）
 
 ### 1. 安装后端依赖
 
@@ -130,7 +130,7 @@ agent_adapter:
       strategy: "kimi"
       command: "kimi"
       output_format: "stream-json"
-      working_dir: "/Users/fuyuuku/projects"  # 修改为你的工作目录
+      working_dir: "../../workspace"  # 相对 backend/config/server.yaml 所在目录；可改为绝对路径
 ```
 
 ### 4. 启动服务

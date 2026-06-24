@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any
 
 import structlog
 
@@ -89,7 +88,15 @@ class CompanionScheduler:
         if status is None:
             return _AggregateStatus.IDLE
         status = str(status).lower()
-        if status in {"working", "processing", "streaming", "thinking", "reading_file", "executing", "outputting"}:
+        if status in {
+            "working",
+            "processing",
+            "streaming",
+            "thinking",
+            "reading_file",
+            "executing",
+            "outputting",
+        }:
             return _AggregateStatus.WORKING
         if status in {"success", "completed", "complete"}:
             return _AggregateStatus.SUCCESS

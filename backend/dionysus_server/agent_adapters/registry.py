@@ -11,7 +11,13 @@ from dionysus_server.config import load_config
 
 from .base import IAgentAdapter
 from .generic_cli import GenericCLIAdapter
-from .strategies import ClaudeStrategy, CodeBuddyStrategy, CodexStrategy, KimiStrategy, OpenCodeStrategy
+from .strategies import (
+    ClaudeStrategy,
+    CodeBuddyStrategy,
+    CodexStrategy,
+    KimiStrategy,
+    OpenCodeStrategy,
+)
 
 logger = structlog.get_logger()
 

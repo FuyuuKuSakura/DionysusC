@@ -1,4 +1,4 @@
-import { create } from 'zustand'
+import { create, type StateCreator } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { parseToolCalls } from '@/lib/tools'
 import type {
@@ -75,26 +75,26 @@ interface ChatState {
   clearToolCalls: () => void
 }
 
-export const useChatStore = create<ChatState>()(
-  persist(
-    (set, get) => ({
-      sessions: [],
-      currentSessionId: null,
-      messages: [],
-      isStreaming: false,
-      currentOptions: null,
-      currentOptionsUiType: null,
-      optionDisabled: false,
-      streamingStatus: null,
-      toolCalls: [],
-      activeToolCallId: null,
-      companionLine: null,
-      companionHistory: [],
-      sessionCompanion: {},
-      todos: [],
-      sessionTodos: {},
+const isTest = typeof process !== 'undefined' && process.env?.VITEST === 'true'
 
-      addSession: (session) => {
+const storeDefinition: StateCreator<ChatState> = (set, get) => ({
+  sessions: [],
+  currentSessionId: null,
+  messages: [],
+  isStreaming: false,
+  currentOptions: null,
+  currentOptionsUiType: null,
+  optionDisabled: false,
+  streamingStatus: null,
+  toolCalls: [],
+  activeToolCallId: null,
+  companionLine: null,
+  companionHistory: [],
+  sessionCompanion: {},
+  todos: [],
+  sessionTodos: {},
+
+  addSession: (session) => {
     const now = Date.now()
     const newSession: Session = {
       id: generateId(),
@@ -750,21 +750,24 @@ export const useChatStore = create<ChatState>()(
   clearToolCalls: () => {
     set({ toolCalls: [], activeToolCallId: null })
   },
-    }),
-    {
-      name: 'dionysus-cache-chat',
-      partialize: (state) => ({
-        sessions: state.sessions,
-        currentSessionId: state.currentSessionId,
-      }),
-      onRehydrateStorage: () => (state) => {
-        if (!state) return
-        // Restore the active messages from the persisted current session.
-        const session = state.sessions.find((s) => s.id === state.currentSessionId)
-        if (session) {
-          state.messages = session.messages
-        }
-      },
-    },
-  ),
+})
+
+export const useChatStore = create<ChatState>()(
+  (isTest
+    ? storeDefinition
+    : persist(storeDefinition, {
+        name: 'dionysus-cache-chat',
+        partialize: (state) => ({
+          sessions: state.sessions,
+          currentSessionId: state.currentSessionId,
+        }),
+        onRehydrateStorage: () => (state) => {
+          if (!state) return
+          // Restore the active messages from the persisted current session.
+          const session = state.sessions.find((s) => s.id === state.currentSessionId)
+          if (session) {
+            state.messages = session.messages
+          }
+        },
+      })) as StateCreator<ChatState>,
 )

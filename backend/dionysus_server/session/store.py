@@ -129,7 +129,10 @@ class SessionStore:
             conn.row_factory = aiosqlite.Row
             await conn.execute(
                 """
-                INSERT INTO sessions (id, title, persona_id, adapter_id, working_dir, status, created_at, updated_at)
+                INSERT INTO sessions (
+                    id, title, persona_id, adapter_id,
+                    working_dir, status, created_at, updated_at
+                )
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
@@ -183,7 +186,9 @@ class SessionStore:
             await conn.execute(
                 """
                 UPDATE sessions
-                SET title = ?, persona_id = ?, adapter_id = ?, working_dir = ?, status = ?, updated_at = ?
+                SET
+                    title = ?, persona_id = ?, adapter_id = ?,
+                    working_dir = ?, status = ?, updated_at = ?
                 WHERE id = ?
                 """,
                 (

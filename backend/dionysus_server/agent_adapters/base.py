@@ -22,7 +22,10 @@ class AgentInput:
         self.mode = mode
 
     def __repr__(self) -> str:
-        return f"AgentInput(text={self.text!r}, attachments={len(self.attachments)}, mode={self.mode!r})"
+        text = repr(self.text)
+        count = len(self.attachments)
+        mode = repr(self.mode)
+        return f"AgentInput(text={text}, attachments={count}, mode={mode})"
 
 
 class IAgentAdapter(ABC):
@@ -49,7 +52,11 @@ class IAgentAdapter(ABC):
     async def shutdown(self) -> None:
         """Clean up resources."""
 
-    async def inject_system_prompt(self, system_prompt: str, context_vars: dict[str, Any] | None = None) -> None:
+    async def inject_system_prompt(
+        self,
+        system_prompt: str,
+        context_vars: dict[str, Any] | None = None,
+    ) -> None:
         """Optional hook to inject a system prompt into the agent context.
 
         Default implementation does nothing. Adapters may override this to

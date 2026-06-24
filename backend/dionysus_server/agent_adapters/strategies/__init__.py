@@ -8,4 +8,10 @@ from .codex import CodexStrategy
 from .kimi import KimiStrategy
 from .opencode import OpenCodeStrategy
 
-__all__ = ["ClaudeStrategy", "CodeBuddyStrategy", "CodexStrategy", "KimiStrategy", "OpenCodeStrategy"]
+__all__ = [
+    "ClaudeStrategy",
+    "CodeBuddyStrategy",
+    "CodexStrategy",
+    "KimiStrategy",
+    "OpenCodeStrategy",
+]

@@ -19,8 +19,10 @@ class CodeBuddyStrategy(JSONStreamStrategy):
     - ``{"type":"file-history-snapshot",...}`` (ignored)
     - ``{"type":"assistant","message":{"content":[{"type":"thinking","thinking":"..."}]}}``
     - ``{"type":"assistant","message":{"content":[{"type":"text","text":"..."}]}}``
-    - ``{"type":"assistant","message":{"content":[{"type":"tool_use","name":"...","input":{...}}]}}``
-    - ``{"type":"result","subtype":"success|error","is_error":false,"result":"...","session_id":"..."}``
+    - ``{"type":"assistant","message":{"content":[{"type":"tool_use",
+      "name":"...","input":{...}}]}}``
+    - ``{"type":"result","subtype":"success|error","is_error":false,
+      "result":"...","session_id":"..."}``
     """
 
     @property
@@ -129,7 +131,10 @@ class CodeBuddyStrategy(JSONStreamStrategy):
                         events.append(
                             AgentEvent(
                                 type="status_update",
-                                payload={"status": StatusEnum.OUTPUTTING, "detail": "CodeBuddy 正在输出..."},
+                                payload={
+                                    "status": StatusEnum.OUTPUTTING,
+                                    "detail": "CodeBuddy 正在输出...",
+                                },
                             )
                         )
                         events.append(

@@ -107,7 +107,11 @@ class CodexStrategy(JSONStreamStrategy):
                     events.append(
                         AgentEvent(
                             type="agent_stream",
-                            payload={"chunk": str(content), "is_final": False, "status": "outputting"},
+                            payload={
+                                "chunk": str(content),
+                                "is_final": False,
+                                "status": "outputting",
+                            },
                         )
                     )
             elif item_type == "command_execution":

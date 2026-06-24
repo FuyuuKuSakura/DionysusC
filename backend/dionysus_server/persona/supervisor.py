@@ -372,7 +372,6 @@ class CompanionSupervisor:
         fleet: _FleetState,
         changes: dict[str, str],
     ) -> str:
-        engine = CompanionEngine(target.persona_id)
         if fleet.working > 0:
             return self._with_persona(
                 target.persona_id,

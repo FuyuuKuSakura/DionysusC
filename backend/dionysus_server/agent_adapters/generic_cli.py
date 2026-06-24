@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import asyncio
+from pathlib import Path
 from typing import Any, AsyncIterator
 
 import structlog
 
+from dionysus_server.config import get_config_dir
 from dionysus_server.models import AgentEvent
 
 from .base import AgentInput, IAgentAdapter
@@ -42,6 +44,19 @@ class GenericCLIAdapter(IAgentAdapter):
         self._restart_count: int = 0
         self._logger = logger.bind(adapter_id=strategy.adapter_id)
 
+    def _resolve_working_dir(self) -> Path:
+        """Resolve working_dir to an absolute path.
+
+        Absolute paths are used as-is. Relative paths are resolved against
+        Dionysus_CONFIG_DIR (the directory containing server.yaml) so that
+        behavior does not depend on the process cwd.
+        """
+        raw = self._working_dir or "."
+        path = Path(raw)
+        if path.is_absolute():
+            return path
+        return (get_config_dir() / path).resolve()
+
     @property
     def agent_id(self) -> str:
         return self._strategy.adapter_id
@@ -63,18 +78,20 @@ class GenericCLIAdapter(IAgentAdapter):
             mode = "normal"
 
         args = self._strategy.build_args(text, self._session_id, mode, self._config)
+        cwd = self._resolve_working_dir()
+        cwd.mkdir(parents=True, exist_ok=True)
         self._logger.info(
             "starting_subprocess",
             command=self._command,
             args=args,
-            working_dir=self._working_dir,
+            working_dir=str(cwd),
         )
 
         try:
             self._process = await asyncio.create_subprocess_exec(
                 self._command,
                 *args,
-                cwd=self._working_dir,
+                cwd=str(cwd),
                 stdin=asyncio.subprocess.PIPE,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.STDOUT,

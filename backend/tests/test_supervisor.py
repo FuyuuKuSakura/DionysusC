@@ -8,12 +8,10 @@ from typing import Any
 
 import pytest
 
-from dionysus_server.models import Message, MessageRole
 from dionysus_server.persona.supervisor import (
     CompanionSupervisor,
     SupervisorConfig,
     _FleetState,
-    _SessionSnapshot,
     load_supervisor_settings,
     save_supervisor_settings,
 )

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import json
 import subprocess
 from pathlib import Path
@@ -22,8 +21,6 @@ from dionysus_server.models import (
     CompanionMessage,
     CompanionMessagePayload,
     EmotionUpdateMessage,
-    TodoUpdateMessage,
-    TodoUpdatePayload,
     EmotionUpdatePayload,
     Live2DActionMessage,
     Live2DActionPayload,
@@ -41,8 +38,10 @@ from dionysus_server.models import (
     StickerSendPayload,
     SystemNoticeMessage,
     SystemNoticePayload,
+    TodoUpdateMessage,
+    TodoUpdatePayload,
 )
-from dionysus_server.persona.companion_engine import CompanionEngine, CompanionReaction
+from dionysus_server.persona.companion_engine import CompanionEngine
 from dionysus_server.persona.companion_scheduler import CompanionScheduler
 from dionysus_server.persona.loader import load_persona
 from dionysus_server.persona.supervisor import (
@@ -725,7 +724,10 @@ class SessionManager:
             yield SystemNoticeMessage(
                 session_id=session_id,
                 payload=SystemNoticePayload(
-                    text=f"已恢复到 Agent session：`{target}`。后续发送的消息将在该 session 中继续。",
+                    text=(
+                        f"已恢复到 Agent session：`{target}`。"
+                        "后续发送的消息将在该 session 中继续。"
+                    ),
                     level="info",
                 ),
             )
