@@ -40,7 +40,8 @@ Dionysus（代号“苹果派”）是一个带 **Live2D 角色陪伴** 的 Codi
 - 💬 **角色台词气泡**：Agent 执行过程中，角色会在右侧实时说出台词，并显示对应情绪 emoji。
 - 🌐 **浏览器聊天界面**：React 18 + TypeScript + Tailwind CSS，支持响应式桌面/移动端。
 - 🔌 **多 Agent 兼容**：已接入 Kimi CLI、Claude CLI、OpenCode CLI、Codex CLI、CodeBuddy CLI，可在会话设置中切换。
-- 🎨 **可更换配色方案**：主题完全由 `backend/config/themes/*.yaml` 驱动，切换无需重新编译。
+- 🎨 **可更换配色方案**：主题完全由 `backend/config/themes/*.yaml` 驱动，新增 `Tech-Flat` 工业蓝主题，切换无需重新编译。
+- 📱 **移动端角色陪伴抽屉**：底部 80% 抽屉，发送消息后自动展开。
 - ⚡ **实时流式反馈**：Agent 执行状态与回复在同一消息气泡内流式更新。
 - 🛑 **打断机制**：前端发送 `interrupt`，后端终止当前 CLI 进程。
 - 💬 **选项交互**：Plan Mode 选项以按钮/下拉框/卡片形式渲染。
@@ -133,7 +134,14 @@ agent_adapter:
       working_dir: "../../workspace"  # 相对 backend/config/server.yaml 所在目录；可改为绝对路径
 ```
 
-### 4. 启动服务
+### 4. 路径与环境变量
+
+- `Dionysus_CONFIG_DIR`：配置文件目录，默认 `backend/config`。
+- `Dionysus_DATA_DIR`：运行时数据目录（SQLite、主题备份、配对设备 token 等），默认与 `Dionysus_CONFIG_DIR` 同级下的 `data`。
+
+Electron 打包后应把这两项指向 `userData` 下的可写目录，避免写入只读 app bundle。
+
+### 5. 启动服务
 
 ```bash
 # 后端（监听所有网卡，方便局域网访问）
@@ -145,7 +153,7 @@ cd frontend
 npm run dev -- --host 0.0.0.0
 ```
 
-### 5. 访问
+### 6. 访问
 
 - 本机：http://localhost:5173
 - 局域网内其他设备：
@@ -153,6 +161,25 @@ npm run dev -- --host 0.0.0.0
   - 直接 IP：`http://<本机IP>:5173`
 
 > 前端会代理 `/ws` 和 `/api` 到后端，因此手机上只需打开前端地址即可使用全部功能。
+
+---
+
+## 测试
+
+```bash
+# 后端
+cd backend
+source .venv/bin/activate
+python -m ruff check dionysus_server tests
+python -m pytest tests -q
+
+# 前端
+cd frontend
+npm run test
+npm run build
+```
+
+CI 已配置在 `.github/workflows/ci.yml`，每次 push / PR 自动运行。
 
 ---
 
