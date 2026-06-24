@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import io
 import json
-import os
 import shutil
 import subprocess
 import uuid
@@ -20,7 +19,7 @@ from fastapi.staticfiles import StaticFiles
 
 from dionysus_server.config import get_config_dir, load_config
 from dionysus_server.models import HandshakeMessage, HandshakePayload, ServerMessage
-from dionysus_server.paths import get_data_dir
+from dionysus_server.paths import get_data_dir, resolve_config_path
 from dionysus_server.persona.loader import (
     _BUILTIN_DIR,
     _PERSONA_DIR,
@@ -797,10 +796,7 @@ def create_app() -> FastAPI:
                 status_code=500,
             )
 
-    _data_root = Path(
-        os.environ.get("Dionysus_DATA_DIR", Path(__file__).parent.parent / "data")
-    )
-    _wallpaper_dir = _data_root / "wallpapers"
+    _wallpaper_dir = get_data_dir() / "wallpapers"
     _wallpaper_dir.mkdir(parents=True, exist_ok=True)
 
     def _clear_wallpaper_dir() -> None:
@@ -896,10 +892,7 @@ def create_app() -> FastAPI:
             )
 
     # Mount static files last so API/WebSocket routes take precedence.
-    static_dir = Path(config.server.static_dir)
-    if not static_dir.is_absolute():
-        project_root = Path(__file__).parent.parent
-        static_dir = project_root / static_dir
+    static_dir = resolve_config_path(config.server.static_dir)
     static_dir.mkdir(parents=True, exist_ok=True)
     app.mount("/wallpapers", StaticFiles(directory=_wallpaper_dir), name="wallpapers")
     app.mount(

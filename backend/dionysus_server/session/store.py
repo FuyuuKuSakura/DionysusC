@@ -5,7 +5,6 @@ from __future__ import annotations
 import json
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import AsyncIterator
 from uuid import uuid4
 
@@ -14,6 +13,7 @@ import structlog
 
 from dionysus_server.config import DionysusConfig, load_config
 from dionysus_server.models import Message, MessageRole, Session, SessionStatus
+from dionysus_server.paths import resolve_data_path
 
 logger = structlog.get_logger()
 
@@ -42,7 +42,7 @@ class SessionStore:
 
     def __init__(self, config: DionysusConfig | None = None) -> None:
         self._config = config or load_config()
-        self._db_path = Path(self._config.sessions.storage_path)
+        self._db_path = resolve_data_path(self._config.sessions.storage_path)
         self._db_path.parent.mkdir(parents=True, exist_ok=True)
         self._logger = logger.bind(component="SessionStore", db_path=str(self._db_path))
 

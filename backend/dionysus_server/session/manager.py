@@ -612,11 +612,11 @@ class SessionManager:
             return
 
         path = resolve_config_path(Path(new_dir).expanduser())
-        if not path.exists():
+        if not path.exists() or not path.is_dir():
             yield SystemNoticeMessage(
                 session_id=session_id,
                 payload=SystemNoticePayload(
-                    text=f"目录不存在：{path}", level="error"
+                    text=f"路径不存在或不是目录：{path}", level="error"
                 ),
             )
             return

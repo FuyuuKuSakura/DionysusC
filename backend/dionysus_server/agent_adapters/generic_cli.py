@@ -51,7 +51,7 @@ class GenericCLIAdapter(IAgentAdapter):
         Dionysus_CONFIG_DIR (the directory containing server.yaml) so that
         behavior does not depend on the process cwd.
         """
-        return resolve_config_path(self._working_dir or ".")
+        return resolve_config_path(Path(self._working_dir or ".").expanduser())
 
     @property
     def agent_id(self) -> str:

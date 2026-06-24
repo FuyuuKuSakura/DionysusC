@@ -31,7 +31,7 @@ class _DionysusModel(BaseModel):
         if info.field_name in {"timestamp", "created_at", "updated_at"} and isinstance(
             value, (int, float)
         ):
-            if value > 1e10:
+            if value > 1e12:
                 return datetime.fromtimestamp(value / 1000, tz=timezone.utc)
         return value
 
