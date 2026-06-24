@@ -41,6 +41,7 @@ from dionysus_server.models import (
     TodoUpdateMessage,
     TodoUpdatePayload,
 )
+from dionysus_server.paths import get_open_command, resolve_config_path
 from dionysus_server.persona.companion_engine import CompanionEngine
 from dionysus_server.persona.companion_scheduler import CompanionScheduler
 from dionysus_server.persona.loader import load_persona
@@ -604,13 +605,13 @@ class SessionManager:
             yield SystemNoticeMessage(
                 session_id=session_id,
                 payload=SystemNoticePayload(
-                    text="请提供目录路径，例如 /cd /Users/fuyuuku/project",
+                    text="请提供目录路径，例如 /cd ~/project",
                     level="warning",
                 ),
             )
             return
 
-        path = Path(new_dir).expanduser().resolve()
+        path = resolve_config_path(Path(new_dir).expanduser())
         if not path.exists():
             yield SystemNoticeMessage(
                 session_id=session_id,
@@ -632,9 +633,9 @@ class SessionManager:
         await self._store.update_session(session)
         await self.close_adapter(session_id)
 
-        # Also open the folder in Finder on macOS.
+        # Also open the folder in the system file manager.
         try:
-            subprocess.Popen(["open", str(path)])
+            subprocess.Popen(get_open_command(path))
         except Exception as exc:
             self._logger.warning("open_folder_failed", error=str(exc))
 
@@ -654,9 +655,9 @@ class SessionManager:
             adapter_id = self._get_session_adapter_id(session_id)
             cfg = self._config.agent_adapter.adapters.get(adapter_id)
             working_dir = cfg.get("working_dir", ".") if cfg else "."
-        path = Path(working_dir).expanduser().resolve()
+        path = resolve_config_path(Path(working_dir).expanduser())
         try:
-            subprocess.Popen(["open", str(path)])
+            subprocess.Popen(get_open_command(path))
         except Exception as exc:
             self._logger.warning("open_folder_failed", error=str(exc))
         yield SystemNoticeMessage(

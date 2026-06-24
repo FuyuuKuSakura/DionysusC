@@ -1,4 +1,7 @@
+const path = require('path');
 const { chromium } = require('playwright-core');
+
+const PROJECT_ROOT = path.resolve(__dirname, '..');
 
 (async () => {
   const browser = await chromium.launch({
@@ -19,6 +22,7 @@ const { chromium } = require('playwright-core');
     if (el) el.click()
   });
   await page.waitForTimeout(1500);
-  await page.screenshot({ path: process.argv[2] || '/Users/fuyuuku/ACP_AGENT2/qa_screenshots/dionysus_mobile_chat.png' });
+  const defaultOut = path.join(PROJECT_ROOT, 'qa_screenshots', 'dionysus_mobile_chat.png');
+  await page.screenshot({ path: process.argv[2] || defaultOut });
   await browser.close();
 })();

@@ -1,5 +1,8 @@
 import asyncio
+from pathlib import Path
 from playwright.async_api import async_playwright
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 async def main():
     async with async_playwright() as p:
@@ -14,7 +17,7 @@ async def main():
         page.on("response", lambda resp: asyncio.create_task(log(resp)))
         await page.goto("http://127.0.0.1:5173/", wait_until="networkidle")
         await page.wait_for_timeout(3000)
-        await page.screenshot(path="/Users/fuyuuku/ACP_AGENT2/frontend_screenshot_playwright.png", full_page=False)
+        await page.screenshot(path=str(PROJECT_ROOT / "frontend_screenshot_playwright.png"), full_page=False)
         print("errors:", errors)
         await browser.close()
         print("ok")

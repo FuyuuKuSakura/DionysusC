@@ -8,8 +8,8 @@ from typing import Any, AsyncIterator
 
 import structlog
 
-from dionysus_server.config import get_config_dir
 from dionysus_server.models import AgentEvent
+from dionysus_server.paths import resolve_config_path
 
 from .base import AgentInput, IAgentAdapter
 from .strategy import CLIAdapterStrategy
@@ -51,11 +51,7 @@ class GenericCLIAdapter(IAgentAdapter):
         Dionysus_CONFIG_DIR (the directory containing server.yaml) so that
         behavior does not depend on the process cwd.
         """
-        raw = self._working_dir or "."
-        path = Path(raw)
-        if path.is_absolute():
-            return path
-        return (get_config_dir() / path).resolve()
+        return resolve_config_path(self._working_dir or ".")
 
     @property
     def agent_id(self) -> str:

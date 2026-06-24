@@ -10,7 +10,7 @@ from pathlib import Path
 import websockets
 
 WS_URL = "ws://127.0.0.1:8765/ws"
-DB_PATH = Path("/Users/fuyuuku/ACP_AGENT2/backend/data/sessions.db")
+DB_PATH = Path(__file__).resolve().parent.parent / "data" / "sessions.db"
 
 
 def db_session(session_id: str) -> dict:

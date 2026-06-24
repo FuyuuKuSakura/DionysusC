@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 from playwright.async_api import async_playwright
 
-ROOT = Path('/Users/fuyuuku/ACP_AGENT2')
+ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / 'frontend_screenshot_qa.png'
 
 TODOS = [

@@ -102,6 +102,7 @@ export type ClientCommand =
   | 'open_working_dir'
   | 'list_kimi_sessions'
   | 'switch_kimi_session'
+  | 'resume_agent_session'
   | 'restart_adapter'
   | 'switch_adapter'
   | 'switch_persona'

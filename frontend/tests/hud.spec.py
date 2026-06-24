@@ -1,5 +1,8 @@
 import asyncio
+from pathlib import Path
 from playwright.async_api import async_playwright
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 async def main():
     async with async_playwright() as p:
@@ -28,7 +31,7 @@ async def main():
             store.getState().setStreaming(false);
         """)
         await page.wait_for_timeout(800)
-        await page.screenshot(path="/Users/fuyuuku/ACP_AGENT2/frontend_screenshot_hud.png", full_page=False)
+        await page.screenshot(path=str(PROJECT_ROOT / "frontend_screenshot_hud.png"), full_page=False)
         await browser.close()
         print("ok")
 

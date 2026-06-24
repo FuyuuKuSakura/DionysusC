@@ -28,6 +28,7 @@ a = Analysis(
         'dionysus_server.agent_adapters.strategies.claude',
         'dionysus_server.agent_adapters.strategies.codex',
         'dionysus_server.agent_adapters.strategies.opencode',
+        'dionysus_server.agent_adapters.strategies.codebuddy',
     ],
     hookspath=[],
     hooksconfig={},

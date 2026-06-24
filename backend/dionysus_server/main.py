@@ -20,6 +20,7 @@ from fastapi.staticfiles import StaticFiles
 
 from dionysus_server.config import get_config_dir, load_config
 from dionysus_server.models import HandshakeMessage, HandshakePayload, ServerMessage
+from dionysus_server.paths import get_data_dir
 from dionysus_server.persona.loader import (
     _BUILTIN_DIR,
     _PERSONA_DIR,
@@ -37,15 +38,15 @@ logger = structlog.get_logger()
 
 
 def _server_settings_path() -> Path:
-    return Path(__file__).parent.parent / "data" / "server_settings.json"
+    return get_data_dir() / "server_settings.json"
 
 
 def _agent_settings_path() -> Path:
-    return Path(__file__).parent.parent / "data" / "agent_settings.json"
+    return get_data_dir() / "agent_settings.json"
 
 
 def _wallpaper_settings_path() -> Path:
-    return Path(__file__).parent.parent / "data" / "wallpaper_settings.json"
+    return get_data_dir() / "wallpaper_settings.json"
 
 
 _DEFAULT_WALLPAPER_OPACITY = 0.15

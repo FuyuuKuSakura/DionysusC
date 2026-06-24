@@ -43,7 +43,7 @@ class WSConnection:
         handshake = HandshakeMessage(
             session_id=self.session_id,
             payload=HandshakePayload(
-                server_version="0.1.0",
+                server_version="0.2.0",
                 session_id=self.session_id,
                 persona_id=getattr(session, "persona_id", None),
                 supported_features=["streaming", "options", "interrupt"],

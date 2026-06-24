@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Session-scoped auto commit + push watcher for ACP_AGENT2
 
-REPO_ROOT="/Users/fuyuuku/ACP_AGENT2"
+REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO_ROOT" || exit 1
 
 INTERVAL=${AUTO_PUSH_INTERVAL:-30}

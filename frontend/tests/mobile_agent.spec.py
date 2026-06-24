@@ -4,8 +4,9 @@ from pathlib import Path
 from playwright.async_api import async_playwright
 
 BASE = "http://127.0.0.1:5173"
-OUT_DIR = Path("/Users/fuyuuku/ACP_AGENT2")
-WORKSPACE = Path("/Users/fuyuuku/ACP_AGENT2/test_workspace")
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+OUT_DIR = PROJECT_ROOT
+WORKSPACE = PROJECT_ROOT / "test_workspace"
 
 IPHONE_13_PRO_MAX = {
     "width": 428,

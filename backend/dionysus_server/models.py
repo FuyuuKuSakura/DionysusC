@@ -7,7 +7,7 @@ from enum import Enum
 from typing import Any, Literal
 from uuid import uuid4
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_serializer, field_validator
 
 
 def _utc_now() -> datetime:
@@ -16,6 +16,30 @@ def _utc_now() -> datetime:
 
 def _new_trace_id() -> str:
     return str(uuid4())
+
+
+def _dt_to_ms(dt: datetime) -> int:
+    return int(dt.timestamp() * 1000)
+
+
+class _DionysusModel(BaseModel):
+    """Base model that reads/writes datetime fields as Unix milliseconds."""
+
+    @field_validator("*", mode="before")
+    @classmethod
+    def _parse_ms_timestamp(cls, value: Any, info: Any) -> Any:
+        if info.field_name in {"timestamp", "created_at", "updated_at"} and isinstance(
+            value, (int, float)
+        ):
+            if value > 1e10:
+                return datetime.fromtimestamp(value / 1000, tz=timezone.utc)
+        return value
+
+    @field_serializer("*", mode="plain")
+    def _serialize_datetime(self, value: Any, info: Any) -> Any:
+        if isinstance(value, datetime):
+            return _dt_to_ms(value)
+        return value
 
 
 class MessageType(str, Enum):
@@ -51,14 +75,14 @@ class StatusEnum(str, Enum):
     IDLE = "idle"
 
 
-class Artifact(BaseModel):
+class Artifact(_DionysusModel):
     type: Literal["image", "file", "mermaid", "latex"]
     mime_type: str | None = None
     data: str | None = None  # base64 or URL
     caption: str | None = None
 
 
-class Attachment(BaseModel):
+class Attachment(_DionysusModel):
     id: str = Field(default_factory=lambda: str(uuid4()))
     filename: str
     mime_type: str
@@ -71,14 +95,14 @@ class Attachment(BaseModel):
 # ---------------------------------------------------------------------------
 
 
-class UserInputPayload(BaseModel):
+class UserInputPayload(_DionysusModel):
     text: str
     attachments: list[Attachment] = Field(default_factory=list)
     interrupt_before_send: bool = False
     mode: Literal["normal", "plan", "yolo", "plan_yolo"] = "normal"
 
 
-class UserInputMessage(BaseModel):
+class UserInputMessage(_DionysusModel):
     type: Literal[MessageType.USER_INPUT] = MessageType.USER_INPUT
     trace_id: str = Field(default_factory=_new_trace_id)
     timestamp: datetime = Field(default_factory=_utc_now)
@@ -86,12 +110,12 @@ class UserInputMessage(BaseModel):
     payload: UserInputPayload
 
 
-class OptionSelectedPayload(BaseModel):
+class OptionSelectedPayload(_DionysusModel):
     selected_id: str
     selected_label: str
 
 
-class OptionSelectedMessage(BaseModel):
+class OptionSelectedMessage(_DionysusModel):
     type: Literal[MessageType.OPTION_SELECTED] = MessageType.OPTION_SELECTED
     trace_id: str = Field(default_factory=_new_trace_id)
     timestamp: datetime = Field(default_factory=_utc_now)
@@ -99,12 +123,12 @@ class OptionSelectedMessage(BaseModel):
     payload: OptionSelectedPayload
 
 
-class InterruptPayload(BaseModel):
+class InterruptPayload(_DionysusModel):
     reason: Literal["user_request", "timeout", "system"] = "user_request"
     insert_message: str | None = None
 
 
-class InterruptMessage(BaseModel):
+class InterruptMessage(_DionysusModel):
     type: Literal[MessageType.INTERRUPT] = MessageType.INTERRUPT
     trace_id: str = Field(default_factory=_new_trace_id)
     timestamp: datetime = Field(default_factory=_utc_now)
@@ -112,13 +136,13 @@ class InterruptMessage(BaseModel):
     payload: InterruptPayload
 
 
-class ClientCommandPayload(BaseModel):
+class ClientCommandPayload(_DionysusModel):
     command: str
     args: str | None = None
     text: str | None = None
 
 
-class ClientCommandMessage(BaseModel):
+class ClientCommandMessage(_DionysusModel):
     type: Literal[MessageType.CLIENT_COMMAND] = MessageType.CLIENT_COMMAND
     trace_id: str = Field(default_factory=_new_trace_id)
     timestamp: datetime = Field(default_factory=_utc_now)
@@ -126,11 +150,11 @@ class ClientCommandMessage(BaseModel):
     payload: ClientCommandPayload
 
 
-class NewSessionPayload(BaseModel):
+class NewSessionPayload(_DionysusModel):
     persona_id: str | None = None
 
 
-class NewSessionMessage(BaseModel):
+class NewSessionMessage(_DionysusModel):
     type: Literal[MessageType.NEW_SESSION] = MessageType.NEW_SESSION
     trace_id: str = Field(default_factory=_new_trace_id)
     timestamp: datetime = Field(default_factory=_utc_now)
@@ -138,7 +162,7 @@ class NewSessionMessage(BaseModel):
     payload: NewSessionPayload
 
 
-class PingMessage(BaseModel):
+class PingMessage(_DionysusModel):
     type: Literal[MessageType.PING] = MessageType.PING
     trace_id: str = Field(default_factory=_new_trace_id)
     timestamp: datetime = Field(default_factory=_utc_now)
@@ -160,14 +184,14 @@ ClientMessage = (
 # ---------------------------------------------------------------------------
 
 
-class HandshakePayload(BaseModel):
+class HandshakePayload(_DionysusModel):
     server_version: str
     session_id: str
     persona_id: str | None = None
     supported_features: list[str]
 
 
-class HandshakeMessage(BaseModel):
+class HandshakeMessage(_DionysusModel):
     type: Literal[MessageType.HANDSHAKE] = MessageType.HANDSHAKE
     trace_id: str = Field(default_factory=_new_trace_id)
     timestamp: datetime = Field(default_factory=_utc_now)
@@ -175,14 +199,14 @@ class HandshakeMessage(BaseModel):
     payload: HandshakePayload
 
 
-class AgentStreamPayload(BaseModel):
+class AgentStreamPayload(_DionysusModel):
     chunk: str
     is_final: bool = False
     status: StatusEnum = StatusEnum.OUTPUTTING
     is_thinking: bool = False
 
 
-class AgentStreamMessage(BaseModel):
+class AgentStreamMessage(_DionysusModel):
     type: Literal[MessageType.AGENT_STREAM] = MessageType.AGENT_STREAM
     trace_id: str = Field(default_factory=_new_trace_id)
     timestamp: datetime = Field(default_factory=_utc_now)
@@ -190,14 +214,14 @@ class AgentStreamMessage(BaseModel):
     payload: AgentStreamPayload
 
 
-class AgentCompletePayload(BaseModel):
+class AgentCompletePayload(_DionysusModel):
     status: Literal["success", "error", "interrupted"]
     duration_ms: int | None = None
     artifacts: list[Artifact] = Field(default_factory=list)
     error_message: str | None = None
 
 
-class AgentCompleteMessage(BaseModel):
+class AgentCompleteMessage(_DionysusModel):
     type: Literal[MessageType.AGENT_COMPLETE] = MessageType.AGENT_COMPLETE
     trace_id: str = Field(default_factory=_new_trace_id)
     timestamp: datetime = Field(default_factory=_utc_now)
@@ -205,21 +229,21 @@ class AgentCompleteMessage(BaseModel):
     payload: AgentCompletePayload
 
 
-class OptionItem(BaseModel):
+class OptionItem(_DionysusModel):
     id: str
     label: str
     description: str | None = None
     icon: str | None = None
 
 
-class OptionRequestPayload(BaseModel):
+class OptionRequestPayload(_DionysusModel):
     question: str
     options: list[OptionItem]
     ui_type: Literal["button_group", "dropdown", "card_list", "input_confirm"] = "button_group"
     timeout_seconds: int | None = 60
 
 
-class OptionRequestMessage(BaseModel):
+class OptionRequestMessage(_DionysusModel):
     type: Literal[MessageType.OPTION_REQUEST] = MessageType.OPTION_REQUEST
     trace_id: str = Field(default_factory=_new_trace_id)
     timestamp: datetime = Field(default_factory=_utc_now)
@@ -227,13 +251,13 @@ class OptionRequestMessage(BaseModel):
     payload: OptionRequestPayload
 
 
-class StatusUpdatePayload(BaseModel):
+class StatusUpdatePayload(_DionysusModel):
     status: StatusEnum
     detail: str
     progress: float | None = None
 
 
-class StatusUpdateMessage(BaseModel):
+class StatusUpdateMessage(_DionysusModel):
     type: Literal[MessageType.STATUS_UPDATE] = MessageType.STATUS_UPDATE
     trace_id: str = Field(default_factory=_new_trace_id)
     timestamp: datetime = Field(default_factory=_utc_now)
@@ -241,14 +265,14 @@ class StatusUpdateMessage(BaseModel):
     payload: StatusUpdatePayload
 
 
-class EmotionUpdatePayload(BaseModel):
+class EmotionUpdatePayload(_DionysusModel):
     emotion: str
     confidence: float
     live2d_expression: str | None = None
     live2d_motion: str | None = None
 
 
-class EmotionUpdateMessage(BaseModel):
+class EmotionUpdateMessage(_DionysusModel):
     type: Literal[MessageType.EMOTION_UPDATE] = MessageType.EMOTION_UPDATE
     trace_id: str = Field(default_factory=_new_trace_id)
     timestamp: datetime = Field(default_factory=_utc_now)
@@ -256,13 +280,13 @@ class EmotionUpdateMessage(BaseModel):
     payload: EmotionUpdatePayload
 
 
-class StickerSendPayload(BaseModel):
+class StickerSendPayload(_DionysusModel):
     emotion: str
     sticker_url: str
     sticker_id: str
 
 
-class StickerSendMessage(BaseModel):
+class StickerSendMessage(_DionysusModel):
     type: Literal[MessageType.STICKER_SEND] = MessageType.STICKER_SEND
     trace_id: str = Field(default_factory=_new_trace_id)
     timestamp: datetime = Field(default_factory=_utc_now)
@@ -270,14 +294,14 @@ class StickerSendMessage(BaseModel):
     payload: StickerSendPayload
 
 
-class Live2DActionPayload(BaseModel):
+class Live2DActionPayload(_DionysusModel):
     action_type: Literal["expression", "motion", "look_at", "lip_sync"]
     name: str
     fade_duration: float | None = None
     params: dict[str, Any] | None = None
 
 
-class Live2DActionMessage(BaseModel):
+class Live2DActionMessage(_DionysusModel):
     type: Literal[MessageType.LIVE2D_ACTION] = MessageType.LIVE2D_ACTION
     trace_id: str = Field(default_factory=_new_trace_id)
     timestamp: datetime = Field(default_factory=_utc_now)
@@ -285,13 +309,13 @@ class Live2DActionMessage(BaseModel):
     payload: Live2DActionPayload
 
 
-class CompanionMessagePayload(BaseModel):
+class CompanionMessagePayload(_DionysusModel):
     text: str
     emotion: str | None = None
     sticker_id: str | None = None
 
 
-class CompanionMessage(BaseModel):
+class CompanionMessage(_DionysusModel):
     type: Literal[MessageType.COMPANION_MESSAGE] = MessageType.COMPANION_MESSAGE
     trace_id: str = Field(default_factory=_new_trace_id)
     timestamp: datetime = Field(default_factory=_utc_now)
@@ -299,17 +323,17 @@ class CompanionMessage(BaseModel):
     payload: CompanionMessagePayload
 
 
-class TodoItem(BaseModel):
+class TodoItem(_DionysusModel):
     id: str
     text: str
     done: bool = False
 
 
-class TodoUpdatePayload(BaseModel):
+class TodoUpdatePayload(_DionysusModel):
     items: list[TodoItem]
 
 
-class TodoUpdateMessage(BaseModel):
+class TodoUpdateMessage(_DionysusModel):
     type: Literal[MessageType.TODO_UPDATE] = MessageType.TODO_UPDATE
     trace_id: str = Field(default_factory=_new_trace_id)
     timestamp: datetime = Field(default_factory=_utc_now)
@@ -317,19 +341,19 @@ class TodoUpdateMessage(BaseModel):
     payload: TodoUpdatePayload
 
 
-class PongMessage(BaseModel):
+class PongMessage(_DionysusModel):
     type: Literal[MessageType.PONG] = MessageType.PONG
     trace_id: str = Field(default_factory=_new_trace_id)
     timestamp: datetime = Field(default_factory=_utc_now)
     session_id: str | None = None
 
 
-class SystemNoticePayload(BaseModel):
+class SystemNoticePayload(_DionysusModel):
     text: str
     level: Literal["info", "warning", "error"] = "info"
 
 
-class SystemNoticeMessage(BaseModel):
+class SystemNoticeMessage(_DionysusModel):
     type: Literal[MessageType.SYSTEM_NOTICE] = MessageType.SYSTEM_NOTICE
     trace_id: str = Field(default_factory=_new_trace_id)
     timestamp: datetime = Field(default_factory=_utc_now)
@@ -364,7 +388,7 @@ class MessageRole(str, Enum):
     SYSTEM = "system"
 
 
-class Message(BaseModel):
+class Message(_DionysusModel):
     id: str = Field(default_factory=lambda: str(uuid4()))
     role: MessageRole
     content: str
@@ -381,7 +405,7 @@ class SessionStatus(str, Enum):
     INTERRUPTED = "interrupted"
 
 
-class Session(BaseModel):
+class Session(_DionysusModel):
     id: str
     title: str = "新会话"
     persona_id: str = "exusiai"
@@ -398,7 +422,7 @@ class Session(BaseModel):
 # ---------------------------------------------------------------------------
 
 
-class AgentEvent(BaseModel):
+class AgentEvent(_DionysusModel):
     """Unified event emitted by any IAgentAdapter implementation."""
 
     type: Literal[

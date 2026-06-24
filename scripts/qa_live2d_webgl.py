@@ -2,7 +2,7 @@ import asyncio
 from pathlib import Path
 from playwright.async_api import async_playwright
 
-OUT = Path('/Users/fuyuuku/ACP_AGENT2/frontend_screenshot_live2d_test.png')
+OUT = Path(__file__).resolve().parent.parent / 'frontend_screenshot_live2d_test.png'
 
 async def capture():
     async with async_playwright() as p:

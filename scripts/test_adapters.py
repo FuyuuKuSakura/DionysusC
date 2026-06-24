@@ -12,9 +12,10 @@ from pathlib import Path
 import websockets
 
 BASE_URL = "ws://127.0.0.1:8765/ws"
-WORK_DIR = Path("/Users/fuyuuku/ACP_AGENT2/test_workspace")
-REPORT_DIR = Path("/Users/fuyuuku/ACP_AGENT2/qa_reports")
-ADAPTERS = ["kimi_cli", "codex_cli", "claude_cli", "opencode_cli"]
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+WORK_DIR = PROJECT_ROOT / "test_workspace"
+REPORT_DIR = PROJECT_ROOT / "qa_reports"
+ADAPTERS = ["kimi_cli", "codex_cli", "claude_cli", "opencode_cli", "codebuddy_cli"]
 TIMEOUTS = {
     "kimi_cli": 120,
     "codex_cli": 300,

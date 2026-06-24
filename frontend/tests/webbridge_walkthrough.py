@@ -1,10 +1,12 @@
 import json
 import time
 import urllib.request
+from pathlib import Path
 
 BASE = 'http://127.0.0.1:10086/command'
 SESSION = 'dionysus-test'
-OUT_DIR = '/Users/fuyuuku/ACP_AGENT2'
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+OUT_DIR = str(PROJECT_ROOT)
 
 
 def send(action: str, args: dict | None = None):

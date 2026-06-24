@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import json
+from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import AsyncIterator
 from uuid import uuid4
 
 import aiosqlite
@@ -44,8 +46,11 @@ class SessionStore:
         self._db_path.parent.mkdir(parents=True, exist_ok=True)
         self._logger = logger.bind(component="SessionStore", db_path=str(self._db_path))
 
-    def _connect(self) -> aiosqlite.Connection:
-        return aiosqlite.connect(self._db_path)
+    @asynccontextmanager
+    async def _connect(self) -> AsyncIterator[aiosqlite.Connection]:
+        async with aiosqlite.connect(self._db_path) as conn:
+            await conn.execute("PRAGMA foreign_keys = ON")
+            yield conn
 
     async def init(self) -> None:
         """Create tables and indexes if they do not exist."""

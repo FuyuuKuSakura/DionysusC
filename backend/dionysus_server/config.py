@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 from typing import Any
 
@@ -11,10 +10,9 @@ import yaml
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from dionysus_server.paths import get_config_dir
+
 logger = structlog.get_logger()
-
-
-DEFAULT_CONFIG_DIR = Path(__file__).parent.parent / "config"
 
 
 class ServerSettings(BaseSettings):
@@ -103,13 +101,10 @@ def load_yaml(path: Path) -> dict[str, Any]:
 
 
 def load_config(config_dir: str | Path | None = None) -> DionysusConfig:
-    config_dir_path = Path(config_dir) if config_dir else DEFAULT_CONFIG_DIR
+    config_dir_path = Path(config_dir) if config_dir else get_config_dir()
     server_yaml = config_dir_path / "server.yaml"
     data = load_yaml(server_yaml)
 
     # Allow environment variables to override anything in server.yaml
     return DionysusConfig(**data)
 
-
-def get_config_dir() -> Path:
-    return Path(os.environ.get("Dionysus_CONFIG_DIR", DEFAULT_CONFIG_DIR))

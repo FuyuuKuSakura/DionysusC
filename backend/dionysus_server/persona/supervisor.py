@@ -434,7 +434,9 @@ class CompanionSupervisor:
 
 
 def _supervisor_settings_path() -> Path:
-    return Path(__file__).parent.parent / "data" / "supervisor_settings.json"
+    from dionysus_server.paths import get_data_dir
+
+    return get_data_dir() / "supervisor_settings.json"
 
 
 def load_supervisor_settings() -> dict[str, Any]:
